@@ -147,25 +147,28 @@ describe('the mobile road is one line', () => {
   });
 
   /*
-   * With all four corners rounded the card's left border curves away 16px above
-   * its own bottom and the rail restarts below it, so the line reads as a box
-   * that closes and a separate stroke that begins. Squaring the bottom-left
-   * runs the left border straight into the rail.
+   * The bottom-left corner stays square so the card's left border runs straight
+   * on into the rail — rounded, it curves away above the card's own bottom and
+   * the line reads as a box that closes and a separate stroke that begins.
+   *
+   * The card used to draw all four sides here. It now draws a top edge and one
+   * vertical, like every lane below it, so only the corner where those two meet
+   * is round and the other three are 0.
    */
   it('squares the corner the rail continues through', () => {
-    expect(cssRule(mobile, '.origin')).toMatch(
-      /border-radius:\s*var\(--road-radius\) var\(--road-radius\) var\(--road-radius\) 0/,
-    );
+    expect(cssRule(mobile, '.origin')).toMatch(/border-radius:\s*var\(--road-radius\) 0 0 0/);
   });
 
   /*
-   * The card grows a right border on mobile but `.origin::before` — the white
-   * dashed centre line — still carries `border-right: 0` from the desktop rule,
-   * so three sides of the card were dashed and the fourth was plain green.
+   * The dashed centre line has to mirror whichever sides the stroke draws, or
+   * some edges read dashed and others plain green. It once had to GAIN a right
+   * dash, because mobile added a right border; now that the card is a path
+   * rather than a box it has to lose the right and bottom ones again.
    */
-  it('carries the dashed centre line onto the border mobile adds', () => {
+  it('mirrors the dashed centre line to the sides the stroke actually draws', () => {
     const body = cssRule(mobile, '.origin::before');
-    expect(body).toMatch(/border-right:\s*var\(--road-dash-width\) dashed var\(--road-dash\)/);
+    expect(body).toMatch(/border-right:\s*0/);
+    expect(body).toMatch(/border-bottom:\s*0/);
   });
 
   /*

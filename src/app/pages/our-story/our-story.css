@@ -619,8 +619,18 @@
     gap: var(--space-24);
     margin: var(--space-32) var(--panel-pad) 0;
     padding: var(--space-32) var(--space-24);
-    border-right: var(--road-width) solid var(--road-color);
-    border-radius: var(--road-radius) var(--road-radius) var(--road-radius) 0;
+    /*
+     * A path, not a box. This card had grown all four borders on a phone,
+     * which is the exact mistake the desktop road was rebuilt to avoid — three
+     * or four sides drawn reads as a rectangle, not as a road passing through.
+     *
+     * It draws a top edge and ONE vertical, like every lane below it: the road
+     * begins at the centre of the top edge (cut back by .origin__cut::before),
+     * turns down the left side and runs straight on into the timeline. So no
+     * right border, no floor, and only the corner it actually turns is round.
+     */
+    border-bottom: 0;
+    border-radius: var(--road-radius) 0 0 0;
   }
 
   /*
@@ -628,15 +638,27 @@
    * carried `border-right: 0` from the desktop rule — three sides dashed and
    * the fourth plain green.
    */
+  /* The dashed centre line mirrors whichever sides the stroke still draws. */
   .origin::before {
     inset: calc(var(--road-width) / -2 - 1px);
-    border-right: var(--road-dash-width) dashed var(--road-dash);
-    border-radius: calc(var(--road-radius) - var(--road-width) / 2)
-      calc(var(--road-radius) - var(--road-width) / 2)
-      calc(var(--road-radius) - var(--road-width) / 2) 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: calc(var(--road-radius) - var(--road-width) / 2) 0 0 0;
   }
 
-  .origin__cut::before,
+  /*
+   * The top stroke is cut back to the card's centre, which is where the road
+   * starts. `50%` alone lands 3px right of it: .origin__cut resolves against
+   * the PADDING box, and that box stops being symmetric once the right border
+   * is gone — so half a stroke comes back off.
+   */
+  .origin__cut::before {
+    display: block;
+    top: calc(var(--road-width) * -1 - 2px);
+    left: calc(50% - var(--road-width) / 2);
+  }
+
+  /* No bottom edge on a phone, so nothing to cut there. */
   .origin__cut::after {
     display: none;
   }

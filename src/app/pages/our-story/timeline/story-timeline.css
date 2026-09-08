@@ -379,8 +379,18 @@
   pointer-events: none;
 }
 
+/*
+ * The chip and its panel share this wrapper, and it has to centre them itself.
+ * `.milestone` centring its children is not enough: closed, this box is the
+ * chip's own 156px; open, it grows to the panel's 287px and a plain block
+ * leaves the narrower chip sitting on its left edge — measured drifting from
+ * x=187.5 to 122 the moment a year was opened.
+ */
 .milestone__disclosure {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .milestone__chip {

@@ -371,3 +371,72 @@ describe('mobile road — the polish pass', () => {
     expect(html).not.toMatch(/data-road-end-side/);
   });
 });
+
+/*
+ * Two corrections after looking at the phone build.
+ *
+ * A. OPENING A YEAR KNOCKED THE CHIP OFF CENTRE. `.milestone` centres its
+ *    children, but the chip and its panel share a `.milestone__disclosure`
+ *    wrapper, and that wrapper is a plain block. Closed it is 156px wide and
+ *    the chip fills it; open it grows to the panel's 287px and the chip, being
+ *    narrower, sits at its left edge — measured drifting from x=187.5 to 122
+ *    while everything around it stayed centred.
+ *
+ * B. THE ORIGIN CARD HAD BECOME A CLOSED BOX. All four borders drawn, which is
+ *    the exact mistake the desktop road was rebuilt to avoid: "a lane is never
+ *    closed on both sides... stacking closed rectangles reads as a list of
+ *    boxes, not a path." On a phone it should read as the START of the road —
+ *    beginning at the centre of its top edge, turning down the left side and
+ *    running on into the timeline.
+ *
+ *    The cut machinery for this already exists. `.origin__cut::before` is what
+ *    stops the top stroke partway on the desktop artboard; it was simply
+ *    switched off below 768.
+ */
+describe('mobile road — the corrections', () => {
+  const storyCss = stripComments(
+    readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'),
+  );
+  const phone = storyCss.slice(storyCss.indexOf('@media (max-width: 767px)'));
+
+  it('centres the chip inside its disclosure, so opening a year cannot shift it', () => {
+    const body = cssRule(mobile, '.milestone__disclosure');
+    expect(body).toMatch(/display:\s*flex/);
+    expect(body).toMatch(/flex-direction:\s*column/);
+    expect(body).toMatch(/align-items:\s*center/);
+  });
+
+  /* Three sides drawn is a box. The road draws a top edge and ONE vertical. */
+  it('stops drawing the origin card as a closed box', () => {
+    const body = cssRule(phone, '.origin');
+    expect(body).not.toMatch(/border-right:\s*var\(--road-width\)/);
+    expect(body).toMatch(/border-bottom:\s*0/);
+  });
+
+  /* Only the corner where the top edge turns into the left rail is rounded. */
+  it('rounds only the corner the road actually turns', () => {
+    expect(cssRule(phone, '.origin')).toMatch(/border-radius:\s*var\(--road-radius\) 0 0 0/);
+  });
+
+  /*
+   * The mask starts at the box's own centre. `50%` alone is 3px out, because
+   * .origin__cut resolves against the PADDING box and that box is no longer
+   * symmetric once the right border is gone — hence the half-stroke correction.
+   */
+  it('cuts the top stroke back to the centre, so the road starts there', () => {
+    const body = cssRule(phone, '.origin__cut::before');
+    expect(body).toMatch(/display:\s*block/);
+    expect(body).toMatch(/left:\s*calc\(50% - var\(--road-width\) \/ 2\)/);
+  });
+
+  it('leaves the bottom cut off, since there is no bottom edge to cut', () => {
+    expect(cssRule(phone, '.origin__cut::after')).toMatch(/display:\s*none/);
+  });
+
+  /* The dashed centre line has to mirror whichever sides the stroke draws. */
+  it('matches the dashed line to the two sides that remain', () => {
+    const body = cssRule(phone, '.origin::before');
+    expect(body).toMatch(/border-right:\s*0/);
+    expect(body).toMatch(/border-bottom:\s*0/);
+  });
+});
