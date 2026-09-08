@@ -664,6 +664,20 @@
     min-height: 0;
   }
 
+  /*
+   * The phone road pulls every box up by one stroke so its top border lands on
+   * the previous box's bottom one. Up here the road is a drawn <svg> with fixed
+   * geometry and nothing wants pulling anywhere — left in, it put every row
+   * after the first 10px high CUMULATIVELY (row 4 was 40px above its measured
+   * lane top, against a road that had not moved) and stretched the second
+   * milestone of each row by 10px, because a negative top margin on a box with
+   * both `top` and `bottom` pinned moves it AND resizes it.
+   */
+  .milestone + .milestone,
+  .journey__row + .journey__row {
+    margin-top: 0;
+  }
+
   .journey__nodes {
     position: absolute;
     inset: 0;
