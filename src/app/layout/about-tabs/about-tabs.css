@@ -1,0 +1,99 @@
+/*
+ * The tab bar sits on the white header band; the panel beneath it carries the
+ * cream page colour. The active tab shares that cream so it reads as continuous
+ * with the panel — which is why the active state is a colour swap, not a border.
+ *
+ * Tab tones are the -50 step of four different ramps, measured from the live
+ * tab bar. The Figma uses cream / lavender / butter / blush, in that order.
+ */
+
+.section-tabs__bleed {
+  background: var(--color-white);
+}
+
+.section-tabs {
+  width: min(100% - var(--gutter) * 2, var(--container-width));
+  margin-inline: auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.section-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.section-tabs ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section-tabs li:not(:first-child) {
+  margin-left: -30px;
+}
+
+.section-tabs a {
+  display: block;
+  padding: 15px var(--space-48);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-400);
+  line-height: var(--line-height-24);
+  color: var(--color-black);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.section-tabs a[data-tone='cream'] {
+  background: var(--color-neutral-50);
+}
+
+.section-tabs a[data-tone='lavender'] {
+  background: var(--color-primary-50);
+}
+
+.section-tabs a[data-tone='butter'] {
+  background: var(--color-yellow-50);
+}
+
+.section-tabs a[data-tone='blush'] {
+  background: var(--color-secondary-50);
+}
+
+/* The current tab rises above its neighbours and takes the panel colour. */
+.section-tabs a.is-current {
+  position: relative;
+  z-index: 2;
+  background: var(--color-neutral-50);
+  font-weight: var(--font-weight-600);
+}
+
+.section-tabs__panel {
+  width: min(100% - var(--gutter) * 2, var(--container-width));
+  margin-inline: auto;
+  background: var(--color-neutral-50);
+  border-top-right-radius: var(--radius-lg);
+}
+
+@media (max-width: 1023px) {
+  .section-tabs a {
+    padding: var(--space-12) var(--space-32);
+  }
+}
+
+@media (max-width: 767px) {
+  .section-tabs a {
+    padding: var(--space-12) var(--space-24);
+    font-size: var(--font-size-16);
+  }
+
+  .section-tabs li:not(:first-child) {
+    margin-left: -16px;
+  }
+
+  .section-tabs__panel {
+    border-top-right-radius: var(--radius-sm);
+  }
+}

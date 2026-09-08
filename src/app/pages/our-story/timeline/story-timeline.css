@@ -1,0 +1,607 @@
+/*
+ * The road.
+ *
+ * Measured off design/ourstory-figma.jpg rather than eyeballed. Scanning the
+ * export for the stroke colour rgb(88,172,110) recovers the whole path:
+ *
+ *   y=1946  x= 712..1292   lane 0 top (right half only — the origin box's
+ *                          bottom edge is its left half)
+ *   x=1298  y=1946..2228   lane 0 closed on the RIGHT
+ *   y=2228  x= 135..1298   lane 0 bottom == lane 1 top
+ *   x= 135  y=2228..2556   lane 1 closed on the LEFT
+ *   ...                    and so on to
+ *   y=3345  x= 135..1298   lane 3 bottom == lane 4 top
+ *   x=1298  y=3345..3573   lane 4 closed on the RIGHT
+ *
+ * The load-bearing fact: **a lane is never closed on both sides.** It draws one
+ * vertical, on the side the road turns, and the side it came in from is left
+ * open for the photograph to spill through. Stacking closed rectangles — what
+ * the first build did — reads as a list of boxes, not a path.
+ *
+ * So: every lane draws its top edge plus one vertical; the vertical carries the
+ * radius at both of its ends, which makes it arc tangentially into the lane
+ * above and the lane below. Only the last lane draws a bottom. Direction is
+ * flex-direction only, so the DOM stays chronological at every width.
+ *
+ * Written mobile-first with the desktop rules inside min-width. That is not
+ * style: `[data-direction] .x` is (0,2,0) and outranks a later `.x` (0,1,0), so
+ * a max-width override silently loses to a direction rule.
+ */
+
+.journey {
+  /*
+   * The step out of the origin box. Measured: the origin's bottom stroke is
+   * y=1900..1909, the step's vertical runs between the two horizontals at
+   * x=700..708, and lane 0's top stroke is y=1942..1950. So the stub in flow
+   * between the two boxes is 33px — the 41px it carried was the centre-to-
+   * centre distance, which is not the gap it has to fill — and it stands at
+   * x=704, 576px into this element's 1184px content box.
+   *
+   * .origin__cut::after reads the same 576/1184 to stop the stroke above it.
+   */
+  --road-step-drop: 33px;
+  --road-step-x: calc(100% * 576 / 1184);
+  position: relative;
+  /* Stroke measured at 11 rows of solid colour: 10 CSS px. */
+  --road-width: 10px;
+  --road-radius: 32px;
+  --road-color: var(--color-green-600);
+  /* Centre line: white dots ~4px wide, 3px tall, on an 8px period. */
+  --road-dash: var(--color-white);
+  --road-dash-width: 3px;
+  padding-block: 0 var(--space-96);
+}
+
+.journey__rows,
+.journey__nodes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The drop out of the origin box into the first lane ------------------- */
+
+/*
+ * The stub itself. Mobile-first like everything else here: below 768 the road
+ * is one straight left rail, so the stub joins it at the left edge and only
+ * moves out to the measured x=704 on desktop.
+ */
+.journey__lead {
+  position: relative;
+  display: block;
+  width: var(--road-width);
+  height: var(--road-step-drop);
+  margin-left: 0;
+  background: var(--road-color);
+}
+
+
+.journey__lead::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 calc(var(--road-width) / 2 - var(--road-dash-width) / 2);
+  border-left: var(--road-dash-width) dashed var(--road-dash);
+}
+
+/*
+ * The turn, drawn only where there is a turn to draw. `overflow: visible` is
+ * what lets its horizontals run past the 10px box at both ends and bury the
+ * square ends of the strokes above and below it.
+ */
+.journey__lead-road {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/*
+ * The drawn road. Hidden below the artboard breakpoint, where the road is one
+ * straight left rail and the row borders do the job perfectly well.
+ *
+ * Sized in the same cqw the artboard uses, and anchored 10px above .journey's
+ * own top so its first segment lands on the origin box's bottom stroke.
+ */
+.journey__road {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(-10 / 1184 * 100cqw);
+  z-index: 0;
+  width: 100%;
+  height: calc(1800 / 1184 * 100cqw);
+  overflow: visible;
+  pointer-events: none;
+}
+
+/*
+ * The end of the road below the artboard breakpoint. Above it the drawn path
+ * carries its own terminus; here the rail was simply stopping in mid-air at the
+ * last lane's floor.
+ *
+ * This has to live in THIS stylesheet: `.journey` belongs to this component, so
+ * the same rule written in our-story.css is scoped to the page's _ngcontent
+ * attribute and never matches — it computed `content: none` on the real page
+ * while the source-level test passed.
+ *
+ * Centred on the 10px rail: -8px pulls the 26px dot half its width left of the
+ * rail's centre at x=5, and -13px puts its own centre on the rail's last pixel.
+ */
+.journey::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: var(--space-96);
+  width: 26px;
+  height: 26px;
+  margin: 0 0 -13px -8px;
+  border-radius: 50%;
+  background: var(--road-color);
+}
+
+/* Lanes ----------------------------------------------------------------- */
+
+/*
+ * Mobile first, and that is load-bearing: `[data-direction] .x` is (0,2,0) and
+ * beats a later `.x` (0,1,0), so a max-width override would silently lose to a
+ * direction rule. Below 768 the snake flattens to one straight left rail — the
+ * Figma ships no mobile artboard, so this is the honest reading of it.
+ */
+.journey__row {
+  position: relative;
+  border-left: var(--road-width) solid var(--road-color);
+}
+
+.journey__track {
+  position: absolute;
+  inset: calc((var(--road-width) + var(--road-dash-width)) / -2);
+  pointer-events: none;
+  border-left: var(--road-dash-width) dashed var(--road-dash);
+}
+
+/* Direction markers on the shared edges --------------------------------- */
+
+.journey__marker {
+  display: block;
+  width: 26px;
+  height: 14px;
+  color: var(--color-secondary-500);
+}
+
+.journey__row > .journey__marker {
+  position: absolute;
+  top: calc(var(--road-width) * -1 - 22px);
+  display: none;
+}
+
+.journey__row[data-direction='ltr'] > .journey__marker {
+  left: 46%;
+}
+
+.journey__row[data-direction='rtl'] > .journey__marker {
+  right: 46%;
+  transform: rotate(180deg);
+}
+
+/* Nodes inside a lane --------------------------------------------------- */
+
+.journey__nodes {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  padding: var(--space-32) var(--space-24);
+}
+
+/*
+ * Below 768 a photograph and its chip cannot sit side by side: 200px of image
+ * plus a ~140px chip plus the gap overflowed a 390px viewport by 46px. Stacked,
+ * with the chip first, so the reading order is year-then-picture on every row
+ * rather than mirroring with `side`.
+ */
+.milestone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+}
+
+.milestone__media {
+  width: min(100%, 260px);
+}
+
+/*
+ * Stacked, the chip always leads — a year label above its photograph reads
+ * better than a photograph with the year underneath. The image comes first in
+ * the DOM (so the desktop mirroring needs no wrapper), hence the blanket order.
+ */
+.milestone__media {
+  order: 1;
+}
+
+.milestone__media {
+  position: relative;
+  z-index: 1;
+  height: auto;
+  max-width: 200px;
+  flex-shrink: 0;
+}
+
+/* Decorative accents sit behind the photograph, out of flow. */
+.milestone__decor {
+  display: none;
+  position: absolute;
+  z-index: 0;
+  height: auto;
+  pointer-events: none;
+}
+
+.milestone__disclosure {
+  position: relative;
+}
+
+.milestone__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-16);
+  /* Measured 195x84 with 48px digits — 20px/28px padding gets there. */
+  padding: var(--space-16) var(--space-24);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-neutral-100);
+  font-family: var(--font-parkinsans);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-700);
+  line-height: 1;
+  color: var(--color-primary-500);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.milestone__chip:hover {
+  background: var(--color-yellow-200);
+}
+
+.milestone__caret {
+  width: 16px;
+  height: 10px;
+  transition: transform 160ms ease;
+}
+
+.milestone__chip[aria-expanded='true'] .milestone__caret {
+  transform: rotate(180deg);
+}
+
+.milestone__panel {
+  margin-top: var(--space-8);
+  padding: var(--space-16) var(--space-24);
+  border-radius: var(--radius-sm);
+  background: var(--color-neutral-100);
+  max-width: 340px;
+}
+
+.milestone__panel ul {
+  margin: 0;
+  padding-left: var(--space-16);
+  display: grid;
+  gap: var(--space-8);
+}
+
+.milestone__panel li {
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  color: var(--color-neutral-900);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone__caret {
+    transition: none;
+  }
+}
+
+/* Two chips per lane, photographs at full size ------------------------- */
+
+@media (min-width: 768px) {
+  /*
+   * A lane draws its top edge plus ONE vertical, on the side the road turns.
+   * The vertical carries the radius at both ends, so it arcs tangentially into
+   * the lane above and the lane below and the whole thing reads as one path.
+   * Measured lane heights: 282, 328, 431, 488, 341.
+   */
+  .journey__row {
+    min-height: 320px;
+    border-left: 0;
+    border-top: var(--road-width) solid var(--road-color);
+  }
+
+  .journey__row[data-direction='ltr'] {
+    border-right: var(--road-width) solid var(--road-color);
+    border-radius: 0 var(--road-radius) var(--road-radius) 0;
+  }
+
+  .journey__row[data-direction='rtl'] {
+    border-left: var(--road-width) solid var(--road-color);
+    border-radius: var(--road-radius) 0 0 var(--road-radius);
+  }
+
+  /* The road has to stop somewhere: the final lane draws its own floor. */
+  .journey__row[data-last] {
+    border-bottom: var(--road-width) solid var(--road-color);
+  }
+
+  /*
+   * Out to the measured x=704 once the snake has two columns to work with, and
+   * the bar hands over to the drawn turn: a 10px rectangle butted into two
+   * horizontals reads as a tee, and the export rounds this corner like every
+   * other one on the road.
+   */
+  .journey__lead {
+    margin-left: calc(var(--road-step-x) - var(--road-width) / 2);
+    background: none;
+  }
+
+  .journey__lead::before {
+    display: none;
+  }
+
+  .journey__lead-road {
+    display: block;
+  }
+
+  /* The dashed centre line mirrors whichever sides the lane actually draws. */
+  .journey__track {
+    border-left: 0;
+    border-top: var(--road-dash-width) dashed var(--road-dash);
+  }
+
+  .journey__row[data-direction='ltr'] .journey__track {
+    border-right: var(--road-dash-width) dashed var(--road-dash);
+    border-radius: 0 var(--road-radius) var(--road-radius) 0;
+  }
+
+  .journey__row[data-direction='rtl'] .journey__track {
+    border-left: var(--road-dash-width) dashed var(--road-dash);
+    border-radius: var(--road-radius) 0 0 var(--road-radius);
+  }
+
+  .journey__row[data-last] .journey__track {
+    border-bottom: var(--road-dash-width) dashed var(--road-dash);
+  }
+
+  .journey__row > .journey__marker {
+    display: block;
+  }
+
+  .journey__nodes {
+    flex-direction: row;
+    /*
+     * Chips ride high in the lane, photographs stand on its floor — measured:
+     * the 2018 chip starts 32px below the lane top, and its photograph ends at
+     * y=2222 against a lane bottom of y=2228.
+     */
+    align-items: flex-end;
+    justify-content: space-between;
+    min-height: inherit;
+    gap: var(--space-32);
+    padding: 0;
+  }
+
+  .journey__row[data-direction='rtl'] .journey__nodes {
+    flex-direction: row-reverse;
+  }
+
+  .milestone {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--space-32);
+    min-height: inherit;
+  }
+
+  .milestone__disclosure {
+    align-self: flex-start;
+    margin-top: var(--space-32);
+  }
+
+  .milestone__chip {
+    font-size: var(--font-size-48);
+    padding: var(--space-16) var(--space-24);
+  }
+
+  /*
+   * Side by side, the Figma sets each photograph left or right of its chip and
+   * `side` carries that from the data. Photographs are ~300px and stand on the
+   * lane floor, deliberately hanging past its open side: the 2018 photo starts
+   * at x=53 in a lane whose inner edge is x=140.
+   */
+  .milestone[data-media-side='before'] .milestone__media {
+    order: 0;
+  }
+
+  .milestone__media {
+    align-self: flex-end;
+    width: auto;
+    max-width: 300px;
+  }
+
+  .milestone__decor {
+    display: block;
+    max-width: 150px;
+    opacity: 0.95;
+  }
+
+  .milestone[data-media-side='before'] .milestone__decor {
+    left: -30px;
+    bottom: -24px;
+  }
+
+  .milestone[data-media-side='after'] .milestone__decor {
+    right: -30px;
+    bottom: -24px;
+  }
+
+  /*
+   * Panels float so opening a year does not change the lane height and shift
+   * the whole road. The chip at a lane's right edge hangs its panel inward.
+   */
+  .milestone__panel {
+    position: absolute;
+    top: calc(100% + var(--space-8));
+    left: 0;
+    z-index: 3;
+    width: 340px;
+    max-width: none;
+    margin-top: 0;
+    box-shadow: 0 12px 28px var(--color-black-20);
+  }
+
+  .milestone[data-panel-align='right'] .milestone__panel {
+    left: auto;
+    right: 0;
+  }
+}
+
+/* The artboard --------------------------------------------------------- */
+
+/*
+ * From here up, the lane stops being a flex row and becomes what the export
+ * actually is: a hand-composed artboard. Every chip, photograph and decor piece
+ * carries its own measured position, and the lane its own measured height.
+ *
+ * Why it has to work this way: in the Figma nothing in a lane shares a baseline.
+ * The 2018 chip sits 32px below its top stroke and the 2019 chip 26px; the 2018
+ * photograph starts at y=55 and the 2019 one at y=117; several photographs
+ * overhang the lane floor by 40px or more, which is exactly why the road steps
+ * down where it does. `justify-content: space-between` on a flex row cannot
+ * produce any of that — it was putting the 2019 chip 74px left of its measured
+ * x and the 2020 chip 116px left and 178px low.
+ *
+ * `.journey` is the container, so 100cqw is the lane's own width and every
+ * placement is a fraction of it. That keeps the whole artboard scaling with the
+ * panel instead of pinning it to 1280 — and it is why this starts at 768 rather
+ * than 1024. The flex layout it replaces overflowed the viewport by 262px
+ * anywhere in 768..1023, because a 340px photograph and a 150px decor piece in
+ * a `space-between` row need more width than that range has. Scaled, they fit.
+ */
+@media (min-width: 768px) {
+  .journey {
+    container-type: inline-size;
+  }
+
+  .journey__road {
+    display: block;
+  }
+
+  /*
+   * Every border-drawn piece of the road comes off here. The path above owns
+   * all of it now, including the two joints these could never draw: the 42px
+   * step at the lane 1/2 boundary and the meander at the lane 2/3 one.
+   */
+  .journey__row,
+  .journey__row[data-direction='ltr'],
+  .journey__row[data-direction='rtl'],
+  .journey__row[data-last] {
+    border: 0;
+    border-radius: 0;
+  }
+
+  /*
+   * The drawn path carries its own terminus, so the mobile dot comes off here.
+   */
+  .journey__track,
+  .journey__lead-road,
+  .journey::after,
+  .journey__row > .journey__marker {
+    display: none;
+  }
+
+  .journey__lead {
+    background: none;
+  }
+
+  /*
+   * Sized from the measurement, not from the content: 282, 328, 301, 488, 341.
+   * `min-height: 360px` was making every lane at least that, which is why lane
+   * 0 rendered 370px against the export's 282.
+   */
+  .journey__row {
+    height: calc(var(--lane-h) / 1184 * 100cqw);
+    min-height: 0;
+  }
+
+  .journey__nodes {
+    position: absolute;
+    inset: 0;
+    display: block;
+    min-height: 0;
+    padding: 0;
+    gap: 0;
+  }
+
+  /*
+   * Each milestone covers its whole lane so its three pieces can position
+   * against the same box. They overlap each other, hence pointer-events: none
+   * here and auto on the only interactive part.
+   */
+  /*
+   * Placements are measured from the OUTER edge of the lane's strokes. The rows
+   * draw no borders up here any more, so their padding box IS that edge and
+   * `inset: 0` is the origin — while the borders existed this needed a 10px
+   * correction, and without it every piece sat 6px low and 10px right on the
+   * reversed rows.
+   */
+  .milestone {
+    position: absolute;
+    inset: 0;
+    display: block;
+    min-height: 0;
+    pointer-events: none;
+  }
+
+  .milestone__disclosure,
+  .milestone__media,
+  .milestone__decor {
+    position: absolute;
+    left: calc(var(--x) / 1184 * 100cqw);
+    top: calc(var(--y) / 1184 * 100cqw);
+    right: auto;
+    bottom: auto;
+    margin: 0;
+  }
+
+  .milestone__disclosure {
+    align-self: auto;
+    pointer-events: auto;
+  }
+
+  .milestone__media,
+  .milestone__decor {
+    display: block;
+    width: calc(var(--w) / 1184 * 100cqw);
+    height: auto;
+    max-width: none;
+    opacity: 1;
+  }
+
+  /*
+   * The chip is drawn 195x84 with 48px digits, and all three scale with the
+   * lane — a fixed 48px inside a chip that shrinks to 103px at the breakpoint
+   * spills straight out of it.
+   */
+  .milestone__chip {
+    width: calc(195 / 1184 * 100cqw);
+    height: calc(84 / 1184 * 100cqw);
+    justify-content: space-between;
+    padding: 0 calc(24 / 1184 * 100cqw);
+    font-size: calc(48 / 1184 * 100cqw);
+  }
+
+  .milestone__caret {
+    width: calc(16 / 1184 * 100cqw);
+    height: calc(10 / 1184 * 100cqw);
+  }
+}

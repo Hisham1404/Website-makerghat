@@ -1,0 +1,63 @@
+<header class="site-header">
+  <div class="site-header__inner container">
+    <a class="site-header__home" routerLink="/" (click)="closeMenu()">
+      <!-- MakerGhat's own logo, CC BY-SA 4.0. The Figma header uses this
+           purple-hand lockup; the footer uses the orange-hand one. -->
+      <img src="assets/logo.svg" alt="MakerGhat — home" width="128" height="60" />
+    </a>
+
+    <button
+      type="button"
+      class="site-header__toggle"
+      aria-label="Main menu"
+      aria-controls="site-menu"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="toggleMenu()"
+    >
+      <span class="site-header__bars" aria-hidden="true"></span>
+    </button>
+
+    <!--
+      One element serves as the horizontal menu on desktop and the drawer on
+      mobile; both class names are present so each stylesheet and each test can
+      address the role it cares about.
+    -->
+    <nav
+      id="site-menu"
+      class="site-header__nav site-header__drawer"
+      [class.is-open]="menuOpen()"
+      aria-label="Main"
+      (click)="closeMenu()"
+    >
+      <ul>
+        @for (item of navItems; track item.label; let last = $last) {
+          <!-- The final menu hangs from its trigger's right edge; left-aligned
+               it runs off the viewport, because the nav sits at the far right. -->
+          <li [attr.data-menu-align]="last ? 'right' : 'left'">
+            <a [routerLink]="item.href">
+              {{ item.label }}
+              @if (item.children?.length) {
+                <svg
+                  class="site-header__caret"
+                  viewBox="0 0 10 6"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              }
+            </a>
+
+            @if (item.children?.length) {
+              <ul class="site-header__dropdown">
+                @for (child of item.children; track child.href) {
+                  <li><a [routerLink]="child.href">{{ child.label }}</a></li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

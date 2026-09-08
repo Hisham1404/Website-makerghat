@@ -1,0 +1,152 @@
+<article class="story-page">
+  <div class="panel-inset">
+    <h1 class="story-page__title">{{ title }}</h1>
+  </div>
+
+  <!-- Spans the full width of the cream panel; not inset like the text blocks. -->
+  <div class="story-hero">
+    <img
+      [src]="hero.src"
+      [alt]="hero.alt"
+      [width]="hero.width"
+      [height]="hero.height"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="intro panel-inset">
+    <img
+      class="intro__decor"
+      [src]="decor.intro.src"
+      [width]="decor.intro.width"
+      [height]="decor.intro.height"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+    />
+
+    <!--
+      Three accents that sit outside the exported cluster: the hexagon trio at
+      x=658..719 y=888..937, the star at x=1265..1295 y=822..850, and the short
+      coral rule at x=1063..1069 y=905..1027. Drawn here in the panel's own
+      coordinates, so the numbers are the measured ones.
+    -->
+    <svg
+      class="intro__accents"
+      viewBox="0 0 1280 300"
+      aria-hidden="true"
+      focusable="false"
+      preserveAspectRatio="none"
+    >
+      <g data-accent="hexes" class="intro__accents-green" fill="none" stroke-width="7">
+        <path d="M589 100l11 6v13l-11 6-11-6v-13z" />
+        <path d="M628 106l11 6v13l-11 6-11-6v-13z" />
+        <path d="M612 128l11 6v13l-11 6-11-6v-13z" />
+      </g>
+      <path
+        data-accent="star"
+        class="intro__accents-coral"
+        d="M1200 39l6 17 14-8-8 14 17 6-17 6 8 14-14-8-6 17-6-17-14 8 8-14-17-6 17-6-8-14 14 8z"
+      />
+      <rect data-accent="bar" class="intro__accents-coral" x="983" y="122" width="6" height="122" />
+    </svg>
+
+    <!-- Cut-outs fill the two empty cells of the mission / why-making grid. -->
+    <img
+      class="intro__media"
+      data-slot="tower"
+      [src]="introMedia.tower.src"
+      [alt]="introMedia.tower.alt"
+      [width]="introMedia.tower.width"
+      [height]="introMedia.tower.height"
+      loading="lazy"
+    />
+    <img
+      class="intro__media"
+      data-slot="girls"
+      [src]="introMedia.girls.src"
+      [alt]="introMedia.girls.alt"
+      [width]="introMedia.girls.width"
+      [height]="introMedia.girls.height"
+      loading="lazy"
+    />
+
+    @for (block of introBlocks; track block.id) {
+      <section
+        class="intro__block"
+        [attr.data-block]="block.id"
+        [attr.aria-labelledby]="block.id + '-heading'"
+      >
+        <h2 [id]="block.id + '-heading'">{{ block.heading }}</h2>
+        <p>{{ block.body }}</p>
+        @if (block.id === 'why') {
+          <!--
+            The turn at the lane's foot. The vertical's centre line is at panel
+            x=706 and the origin's top stroke's centre at y=552, and the corner
+            is rounded at 16px on its outer edge — 11px on the centre line this
+            path strokes. The vertical belongs to this block and the horizontal
+            to the origin box's top edge, so no one box owns both sides of the
+            corner; this fixed-size piece draws it, anchored to the lane's own
+            corner so fluid columns cannot drift it off the joint.
+          -->
+          <svg
+            class="intro__elbow"
+            viewBox="0 0 32 36"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <path
+              data-road="stroke"
+              d="M16 -2 V20 Q16 31 5 31 H-2"
+              fill="none"
+              stroke="var(--color-green-600)"
+              stroke-width="10"
+            />
+            <path
+              data-road="dash"
+              d="M16 -2 V20 Q16 31 5 31 H-2"
+              fill="none"
+              stroke="var(--color-white)"
+              stroke-width="3"
+              stroke-dasharray="4 4"
+            />
+          </svg>
+        }
+      </section>
+    }
+  </div>
+
+  <section class="origin panel-inset" aria-labelledby="origin-heading">
+    <!-- Decorative: cuts the box's top and bottom edges back to the lengths the
+         Figma draws, so the road reads as one path instead of a closed box. -->
+    <span class="origin__cut" aria-hidden="true"></span>
+
+    <div class="origin__body">
+      <h2 id="origin-heading">{{ origin.heading }}</h2>
+      <p>{{ origin.body }}</p>
+      <img
+        class="origin__decor"
+        [src]="decor.origin.src"
+        [width]="decor.origin.width"
+        [height]="decor.origin.height"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+      />
+    </div>
+
+    <img
+      class="origin__photo"
+      [src]="origin.photo.src"
+      [alt]="origin.photo.alt"
+      [width]="origin.photo.width"
+      [height]="origin.photo.height"
+      loading="lazy"
+    />
+  </section>
+
+  <div class="panel-inset story-page__journey">
+    <app-story-timeline />
+  </div>
+</article>

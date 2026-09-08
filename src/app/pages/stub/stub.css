@@ -1,0 +1,9 @@
+.stub-page {
+  padding-block: var(--space-96) var(--space-160);
+  max-width: 640px;
+  min-height: 60vh;
+}
+
+.stub-page p {
+  margin-top: var(--space-16);
+}

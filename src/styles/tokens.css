@@ -1,0 +1,166 @@
+/*
+ * Design tokens.
+ *
+ * Everything above the "Additions" block was measured from makerghat.org's own
+ * production stylesheet (static/css/main.ec5aa4f4.css, 2026-09-06) and is
+ * reproduced verbatim. This is how the recreation stays compatible with the
+ * existing site: the palette, type scale and container width are theirs, so the
+ * page drops into their design system without a translation layer.
+ *
+ * Locked by src/styles/design-tokens.spec.ts. Change a value there too, or the
+ * suite will tell you the token drifted from its source.
+ */
+
+:root {
+  /* Neutrals ------------------------------------------------------------- */
+  --color-black: #000;
+  --color-black-20: #00000030;
+  --color-white: #fff;
+  --color-grey: #ffffff4d;
+  --color-red: #e60000;
+
+  --color-neutral-50: #f9f4e8;   /* page background — the cream */
+  --color-neutral-100: #f5ead6;  /* Figma year-chip + accordion fill, sampled */
+  --color-neutral-200: #ead8b5;  /* milestone card fill */
+  --color-neutral-700: #856633;
+  --color-neutral-900: #3f2b12;
+
+  /* Primary — purple ----------------------------------------------------- */
+  --color-primary: #4a3a80;
+  --color-primary-50: #f1eef9;
+  --color-primary-100: #aea6c6;
+  --color-primary-200: #9289b3;
+  --color-primary-300: #776ba0;
+  --color-primary-400: #5c4e8d;
+  --color-primary-500: #4a3a80;  /* headings, nav, footer */
+  --color-primary-500-80: #4a3a80cc;
+  --color-primary-600: #40336f;
+  --color-primary-700: #362c5f;
+  --color-primary-800: #2c254f;
+  --color-primary-800-80: #2d2650ce;
+  --color-primary-900: #221e3f;
+
+  /* Secondary — coral ---------------------------------------------------- */
+  --color-secondary: #f1805e;
+  --color-secondary-50: #fdeae5;
+  --color-secondary-100: #facfc5;
+  --color-secondary-200: #f6b3a4;
+  --color-secondary-300: #f4977b;
+  --color-secondary-400: #f1866a;
+  --color-secondary-500: #f1805e;  /* CTA buttons, accents */
+  --color-secondary-600: #d56b4e;
+  --color-secondary-700: #b95d44;
+  --color-secondary-800: #9d4f39;
+  --color-secondary-850: #833f2d;
+  --color-secondary-900: #4d2117;
+  --color-secondary-900-60: #4d211799;
+
+  /* Yellow --------------------------------------------------------------- */
+  --color-yellow: #ffbd00;
+  --color-yellow-50: #fff9e6;
+  --color-yellow-100: #fff3cc;
+  --color-yellow-200: #ffe699;
+  --color-yellow-300: #ffd966;
+  --color-yellow-500: #ffd150;
+  --color-yellow-600: #e6bc48;
+  --color-yellow-700: #cca63f;
+  --color-yellow-800: #9a7b2e;
+  --color-yellow-900: #594918;
+  --color-yellow-900-60: #59481899;
+
+  /* Green — the timeline path -------------------------------------------- */
+  --color-green: #66c67f;
+  --color-green-50: #ddf3e4;
+  --color-green-100: #bfe9cd;
+  --color-green-200: #a0deb6;
+  --color-green-300: #81d4a0;
+  --color-green-400: #72cc92;
+  --color-green-500: #66c67f;
+  --color-green-600: #58ad6f;  /* the 3px journey stroke */
+  --color-green-700: #4b945f;
+  --color-green-800: #3d7b4f;
+  --color-green-900: #234a30;
+  --color-green-900-50: #234a3080;
+  --color-green-900-70: #234a30b3;
+
+  /* Typefaces ------------------------------------------------------------ */
+  --font-parkinsans: Parkinsans, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-outfit: Outfit, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-bungee: Bungee, Impact, system-ui, sans-serif;
+
+  /* Type scale ----------------------------------------------------------- */
+  --font-size-8: 8px;
+  --font-size-10: 10px;
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-22: 22px;
+  --font-size-24: 24px;
+  --font-size-28: 28px;
+  --font-size-32: 32px;
+  --font-size-36: 36px;
+  --font-size-48: 48px;
+  --font-size-64: 64px;
+  --font-size-80: 80px;
+  --font-size-90: 90px;
+
+  --font-weight-300: 300;
+  --font-weight-400: 400;
+  --font-weight-500: 500;
+  --font-weight-600: 600;
+  --font-weight-700: 700;
+
+  --line-height-12: 12px;
+  --line-height-14: 14px;
+  --line-height-16: 16px;
+  --line-height-18: 18px;
+  --line-height-20: 20px;
+  --line-height-24: 24px;
+  --line-height-28: 28px;
+  --line-height-30: 30px;
+  --line-height-32: 32px;
+  --line-height-36: 36px;
+  --line-height-44: 44px;
+  --line-height-56: 56px;
+  --line-height-80: 80px;
+  --line-height-90: 90px;
+
+  /* Layout --------------------------------------------------------------- */
+  --container-width: 1280px;
+
+  /*
+   * Gutter, not padding. The content box caps at --container-width and the
+   * gutter only bites once the viewport is narrower than that — so at 1440 the
+   * content sits at exactly (1440 - 1280) / 2 = 80px, which is where the Figma
+   * draws it. Baking padding inside the max-width instead pushes it to 128px.
+   */
+  --gutter: 48px;
+  --panel-pad: 48px;
+
+  --header-video-desktop: 490px;
+  --header-video-tablet: 320px;
+  --header-video-mobile: 220px;
+
+  /* ---------------------------------------------------------------------- *
+   * Additions — not present in makerghat.org's stylesheet.
+   * Their CSS has no spacing scale; every gap is a bare pixel value. A scale
+   * is added here so this page has one vocabulary for rhythm instead of forty
+   * magic numbers. Documented as an addition in the README.
+   * ---------------------------------------------------------------------- */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+  --space-160: 160px;
+
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+}

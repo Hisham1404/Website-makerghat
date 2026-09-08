@@ -1,0 +1,85 @@
+/*
+ * Layout primitives.
+ *
+ * Breakpoints follow makerghat.org's own stylesheet, where 768px (37 rules) and
+ * 500px (35 rules) carry almost all the responsive weight, with 1024px used for
+ * the tablet step. The Figma ships a desktop frame only, so these are inherited
+ * rather than invented — see README "Assumptions".
+ *
+ *   >= 1440   desktop, container caps at 1280px
+ *   1024-1439 desktop, fluid container
+ *   768-1023  tablet
+ *   < 768     mobile
+ *   < 500     small mobile
+ */
+
+.container {
+  width: min(100% - var(--gutter) * 2, var(--container-width));
+  margin-inline: auto;
+}
+
+/*
+ * Content inside the cream panel is inset a further 48px — measured: the panel
+ * edge is at x=80 and the h1 at x=127. Applied per block rather than as panel
+ * padding, because the hero has to run the full panel width.
+ */
+.panel-inset {
+  padding-inline: var(--panel-pad);
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --gutter: 32px;
+    --panel-pad: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --gutter: 16px;
+    --panel-pad: 20px;
+  }
+}
+
+/* Visible only to assistive tech until focused. */
+.skip-link {
+  position: absolute;
+  left: var(--space-16);
+  top: var(--space-16);
+  z-index: 100;
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-500);
+  color: var(--color-white);
+  font-family: var(--font-outfit);
+  font-weight: var(--font-weight-600);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+/*
+ * :focus, not :focus-visible. A skip link is only ever reached by keyboard, and
+ * :focus-visible is not set by programmatic .focus() — so a focus-visible-only
+ * rule leaves the link invisible in exactly the cases that matter.
+ */
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-main:focus {
+  outline: none;
+}
+
+/* Present for assistive tech, absent from the picture. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

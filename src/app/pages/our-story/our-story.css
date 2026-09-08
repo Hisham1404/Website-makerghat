@@ -1,0 +1,649 @@
+/* Page title ---------------------------------------------------------- */
+
+.story-page__title {
+  padding-block: var(--space-64) var(--space-48);
+}
+
+/* Hero ---------------------------------------------------------------- */
+
+/*
+ * Measured from the reference: the hero band runs y=391..783, so 393px, and it
+ * spans the panel (x=80..1360) rather than bleeding to the frame edge. The
+ * --header-video-* tokens are their homepage video sizes; they are not this.
+ */
+.story-hero img {
+  width: 100%;
+  height: 393px;
+  object-fit: cover;
+}
+
+/* Intro --------------------------------------------------------------- */
+
+/*
+ * The Figma staggers these: "Our mission" sits top-left, "Why making?" drops to
+ * the lower right. A two-by-two grid with one cell in each diagonal gives that
+ * without absolute positioning, so it collapses cleanly at narrow widths.
+ */
+.intro {
+  --road-width: 10px;
+  --road-radius: 16px;
+  --road-color: var(--color-green-600);
+  --road-dash: var(--color-white);
+  --road-dash-width: 3px;
+  /*
+   * The road's horizontal strokes are absolutes in the Figma - the top of the
+   * why-making lane is y=1026, the top of the origin box y=1330 - and the
+   * mission paragraph above the first of them runs on to y=1049. Grid rows size
+   * to their content, so that 23px of copy, plus the 4px the band moved down
+   * when its top padding was corrected to 70, has to be given back as a
+   * negative margin or the stroke drifts down by it.
+   *
+   * ONLY the text block overhangs. Both photographs stand on their stroke and
+   * stop dead there; giving them this margin too is what painted the tower over
+   * the top lane, so the road appeared to end at the photograph.
+   */
+  --intro-overhang: 27px;
+  position: relative;
+  display: grid;
+  /*
+   * Not 1fr 1fr: the lane's left stroke is measured at x=781, i.e. 701px into
+   * the panel. With the 48px text inset and a 64px gutter that is 589/531.
+   * .origin__cut::before repeats these two numbers to stop the origin's top
+   * stroke at the same place - change one and change the other.
+   */
+  grid-template-columns: 589fr 531fr;
+  column-gap: var(--space-64);
+  /*
+   * 70, not 64: the mission heading's ink is at y=858, 75px below the hero's
+   * y=783, and a 36/44 line puts its ink 5.5px below its own box top.
+   * No bottom padding - the lane must land on the origin box's top edge.
+   */
+  padding-block: 70px 0;
+}
+
+/*
+ * Both text columns are narrow in the Figma: the mission copy wraps inside
+ * 396px and the why-making copy inside 362px. `max-width: 46ch` rendered them
+ * at 462px and 502px, so no line break matched.
+ */
+.intro__block[data-block='mission'] {
+  max-width: 400px;
+  margin-bottom: calc(var(--intro-overhang) * -1);
+}
+
+/*
+ * 36px, checked by text width rather than by cap height: "Our mission" measures
+ * 216px wide in the export and "Why making?" 251px, and those are what 36px
+ * Parkinsans renders (267px and 309px at 44px). An earlier pass read the 30px
+ * capital 'O' at y=858..888 and inferred 44px — the wrong measurement to use.
+ */
+.intro__block h2 {
+  font-size: var(--font-size-36);
+}
+
+.intro__block p {
+  /* Five lines on a 28px lead, y=920 to y=1032. */
+  line-height: var(--line-height-28);
+}
+
+.intro__block[data-block='mission'] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/*
+ * The why-making block is the road lane, so it has to span its whole column.
+ * Only its text is held to the measured 365px.
+ */
+.intro__block[data-block='why'] > h2,
+.intro__block[data-block='why'] > p {
+  max-width: 365px;
+}
+
+.intro__block[data-block='why'] {
+  grid-column: 2;
+  grid-row: 2;
+  /* This block IS the first lane of the road: bordered top and left, open on the
+     right where its top edge runs out under the tower photograph, and square at
+     the foot — the turn into the origin box's top edge is drawn by .intro__elbow,
+     because a bottom-left radius here has no bottom border to turn into and
+     renders as an inward hook instead of a corner. */
+  align-self: stretch;
+  max-width: none;
+  margin-right: calc(var(--panel-pad) * -1);
+  /*
+   * Measured against the lane's own strokes, re-read off the export: the
+   * heading's ink is at y=1123, 97px below the top stroke's outer edge at
+   * y=1026 - 10px of that is the border and 5px is half-leading, so 82px of
+   * padding. The text ink starts at x=871, 80px right of the left stroke's
+   * inner edge at x=791. The last line's box clears the foot by 12px, which
+   * makes the lane 10 + 82 + 200 + 12 = 304px tall and lands its bottom on the
+   * origin box's top stroke at y=1330.
+   */
+  padding: 82px var(--space-48) 12px 80px;
+  border-top: var(--road-width) solid var(--road-color);
+  border-left: var(--road-width) solid var(--road-color);
+  border-top-left-radius: var(--road-radius);
+}
+
+.intro__block[data-block='why']::before {
+  content: '';
+  position: absolute;
+  top: calc((var(--road-width) + var(--road-dash-width)) / -2);
+  left: calc((var(--road-width) + var(--road-dash-width)) / -2);
+  right: 0;
+  bottom: calc((var(--road-width) + var(--road-dash-width)) / -2);
+  border-top: var(--road-dash-width) dashed var(--road-dash);
+  border-left: var(--road-dash-width) dashed var(--road-dash);
+  border-top-left-radius: calc(var(--road-radius) - var(--road-width) / 2);
+  pointer-events: none;
+}
+
+/*
+ * The elbow at the lane's foot. The vertical's centre line is at panel x=706
+ * and the origin's top stroke's centre at y=552 (its 10px stroke runs
+ * 547..557), and the turn is rounded at 16px on the outer edge - so 11px on the
+ * centre line the SVG strokes.
+ *
+ * Fixed 32x36, offset from the lane's own corner, which is its padding-box
+ * origin: -21px left (10px of left border plus the 11px curve zone) and -10px
+ * bottom (the lane draws no bottom border, so its padding bottom IS the
+ * corner). Fixed px so fluid columns cannot drift it off the joint. Paints over
+ * the lane's square end and the mask cut alike.
+ */
+.intro__elbow {
+  position: absolute;
+  left: -21px;
+  bottom: -10px;
+  width: 32px;
+  height: 36px;
+  overflow: visible;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/*
+ * Illustrated layer, behind everything and out of flow.
+ *
+ * Geometry taken from the Figma node: the cluster sits at x=33 and is 899 wide
+ * inside a 1280 panel, so it starts just left of the panel edge and stops well
+ * short of the "Why making?" column at x=870. Sizing it any wider drags the
+ * lightbulb across that heading.
+ */
+.intro__decor {
+  display: none;
+  position: absolute;
+  left: -3.7%;
+  z-index: 0;
+  width: 70%;
+  height: auto;
+  pointer-events: none;
+}
+
+/*
+ * The cluster's own bbox in the export is x=33..932, y=949..1363. `left` and
+ * `width` resolve against the padding box (the 1280 panel), which is why they
+ * read as -3.7% and 70%; `top` is measured from the top of the intro band.
+ */
+.intro__decor {
+  top: 134px;
+}
+
+.intro__accents {
+  display: none;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  height: 300px;
+  pointer-events: none;
+}
+
+.intro__accents-green {
+  stroke: var(--color-green-500);
+}
+
+.intro__accents-coral {
+  fill: var(--color-secondary-500);
+}
+
+@media (min-width: 1024px) {
+  .intro__decor,
+  .intro__accents {
+    display: block;
+  }
+}
+
+.intro__block,
+.intro__media {
+  position: relative;
+  z-index: 1;
+}
+
+.intro__media {
+  height: auto;
+  align-self: end;
+}
+
+/*
+ * Measured ink x=1069..1360: the tower photograph's right edge IS the panel
+ * edge, 48px past the text inset, so it hangs out of the inset by that much.
+ * 292 wide is its 2x render at half size; its ink fills that width and its box
+ * bottom, 194px down, lands on the road stroke at y=1026.
+ *
+ * It carried margin-bottom: -23px, which put it 23px BELOW the stroke. Being
+ * opaque there and above the lane in z-order it then erased the road for its
+ * whole width, which is why the top lane looked like it stopped at the
+ * photograph instead of running out to the panel edge.
+ */
+.intro__media[data-slot='tower'] {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin-right: calc(var(--panel-pad) * -1);
+  /*
+   * Its box runs y=832..1026, and the band's content starts at y=853 — so it
+   * hangs 21px above the top padding, the mirror of the 27px the mission copy
+   * hangs below the road. Without this the tower is the tallest thing in row 1
+   * (194px against the mission block's 200-27=173) and it, not the copy, sets
+   * where the row ends: the whole road, the why-making lane, both photographs
+   * and the origin box below them all sat 21px low.
+   */
+  margin-top: -21px;
+  z-index: 2;
+  width: 292px;
+}
+
+/*
+ * Measured ink x=146..489. 397 wide is its 2x render at half size, and that
+ * render carries 100px of transparent margin down its left edge - 50px once
+ * halved - so the BOX has to start at panel x=96 for the INK to start at 146.
+ * That is 32px left of the 128px text inset, not 18px right of it: drawn 344
+ * wide from x=146 the visible girls came out 45px narrow and 43px too far
+ * right. Its box bottom, 297px down, lands on the origin box's top stroke.
+ */
+.intro__media[data-slot='girls'] {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  margin-left: -32px;
+  width: 397px;
+  z-index: 2;
+}
+
+.intro__block h2 {
+  margin-bottom: var(--space-16);
+}
+
+/* Origin story -------------------------------------------------------- */
+
+/*
+ * The green rule is open on the right in the Figma, where it continues into the
+ * illustrated path that eventually becomes the timeline. Drawn here as three
+ * sides of a rounded box; the connecting path arrives with the decor layer.
+ */
+.origin {
+  --road-width: 10px;
+  --road-radius: 16px;
+  --road-color: var(--color-green-600);
+  --road-dash: var(--color-white);
+  --road-dash-width: 3px;
+  position: relative;
+  display: grid;
+  /*
+   * Measured, not fractional. The paragraph wraps inside 344px and the
+   * photograph is its own 1184x806 render at half — 592x403 — so the tracks
+   * are those two sizes and `space-between` puts the leftover 130px between
+   * them, which lands the photograph's left edge on the measured x=700.
+   * Fractional tracks stretched the photograph to 571 and pushed it 40px right.
+   */
+  grid-template-columns: minmax(0, 350px) minmax(0, 592px);
+  justify-content: space-between;
+  /*
+   * Neither column is centred in the export: the heading ink sits 113px below
+   * the box's top edge and the photograph 100px. `align-items: center` cannot
+   * produce that, and it was what held the content 17px high.
+   */
+  align-items: start;
+  /*
+   * The rail is ONE line down the whole page: the origin's left stroke measures
+   * x=130..139 in the export and lane 1's, 300px lower, measures x=130..139 as
+   * well. 55 put this box's stroke at 135..145 while the timeline's rows draw
+   * theirs from x=128 — a 7px jog at the joint. Flush against the intro above,
+   * so the why-making lane's foot lands on this box's top edge.
+   */
+  margin: 0 0 0 50px;
+  /*
+   * Heading ink x=221 y=1443 against a padding box that starts at panel x=60,
+   * y=1340; photograph's right edge at panel x=1212. No bottom padding — the
+   * decor cluster runs to the bottom stroke and 3px over it.
+   */
+  padding: 98px 68px 0 80px;
+  border: var(--road-width) solid var(--road-color);
+  border-right: 0;
+  border-radius: var(--road-radius) 0 0 var(--road-radius);
+}
+
+/* Dashed centre line on the drawn sides. */
+.origin::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--road-width) / -2 - 1px) 0 calc(var(--road-width) / -2 - 1px) calc(var(--road-width) / -2 - 1px);
+  border: var(--road-dash-width) dashed var(--road-dash);
+  border-right: 0;
+  border-radius: calc(var(--road-radius) - var(--road-width) / 2) 0 0 calc(var(--road-radius) - var(--road-width) / 2);
+  pointer-events: none;
+}
+
+/*
+ * The span itself must never be a grid item. With no rule of its own it was a
+ * static child of the origin's two-column grid and took cell 1/1, which pushed
+ * the heading and copy into column two and dropped the group photograph onto a
+ * second row: the box rendered 862px tall with its text on the right, where the
+ * Figma has the heading at x=220 on the left and the photograph beside it.
+ *
+ * inset:0 makes its box the origin's padding box exactly, so the two cuts below
+ * resolve their offsets against the same rectangle they always did.
+ */
+.origin__cut {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * Both horizontal edges of the origin box are PARTIAL in the Figma, because the
+ * road only runs along part of each: the top edge measures x=135..785 (it stops
+ * under the why-making lane coming down) and the bottom edge x=135..706 (it
+ * steps down there into lane 0). Drawing them full-width — which is what the
+ * first build did — closes the box and breaks the sense of a single path.
+ *
+ * So the borders are drawn full-width and then cut back with two masks in the
+ * panel's own cream. The dashed centre line is inside the stroke, so a mask
+ * over the stroke takes the dashes with it.
+ */
+.origin__cut::before,
+.origin__cut::after {
+  content: '';
+  position: absolute;
+  right: calc(var(--road-width) * -1);
+  height: calc(var(--road-width) + 4px);
+  background: var(--color-neutral-50);
+}
+
+/*
+ * Top edge: kept as far as the lane, cut from there on. `left: 50%` ended the
+ * stroke at panel x=672 while the lane comes down at x=701, leaving 16px of
+ * cream between the stroke and the elbow.
+ *
+ * The lane's x is 48 (text inset) + col1 + 64 (gutter), and col1 is 589/1120 of
+ * the panel's content less that gutter. This element's percentages resolve
+ * against the origin's padding box, which is the panel less 65px, so the panel
+ * is `100% + 65px` and the offset from the padding box works out at
+ * 47px + (100% - 95px) * 589/1120. Exact at every width, and it tracks .intro's
+ * grid-template-columns rather than guessing at it.
+ */
+.origin__cut::before {
+  top: calc(var(--road-width) * -1 - 2px);
+  left: calc(52px + (100% - 100px) * 589 / 1120);
+}
+
+/*
+ * Bottom edge: kept to the point where the road steps down into lane 0. The
+ * step is .journey__lead, 576/1184 of the way across the journey's content box
+ * — panel x=704 — and this stroke has to stop at the far side of its 10px
+ * stub. `left: 49%` ran it to x=740, 36px past the corner.
+ *
+ * Same substitution as the top cut: this element's percentages resolve against
+ * the origin's padding box, which is the panel less 60px, so the panel is
+ * `100% + 60px` and the journey's content box is `100% - 36px`.
+ */
+.origin__cut::after {
+  bottom: calc(var(--road-width) * -1 - 2px);
+  left: calc((100% - 36px) * 576 / 1184 - 7px);
+}
+
+/*
+ * Measured x=219..699 y=1703..1901, which is exactly the 480x199 the SVG
+ * declares. It is wider than its own 350px column on purpose: the green
+ * stair-step runs on under the photograph, which paints over it because the
+ * photograph is the later grid item. The -3px is real too — the yellow wedge
+ * sits ON the bottom stroke, 3px past the padding box.
+ */
+.origin__decor {
+  display: none;
+  margin: 21px 0 -3px;
+  width: 480px;
+  max-width: none;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .origin__decor {
+    display: block;
+  }
+}
+
+.origin__body h2 {
+  margin-bottom: var(--space-16);
+  max-width: 12ch;
+}
+
+/*
+ * The same 28px lead as the intro copy — measured at y=1546/1575/1602/1630/1659
+ * in the export. It was inheriting the 24px body default, which cost 20px over
+ * five lines and pulled the decor cluster, the bottom stroke, the step and the
+ * whole timeline below it up by exactly that.
+ */
+.origin__body p {
+  line-height: var(--line-height-28);
+}
+
+/*
+ * Measured x=700..1293 y=1430..1837, i.e. the 1184x806 render at half. It was
+ * `width: 100%`, so the grid column decided its size and it came out 571x389.
+ * The 8px lift is the gap between the photograph's top (y=1430) and the text
+ * column's (y=1437.5), which the shared `align-items: start` cannot express.
+ */
+.origin__photo {
+  width: 592px;
+  height: auto;
+  margin-top: -8px;
+  border-radius: var(--radius-lg);
+}
+
+/* Tablet -------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .story-hero img {
+    height: 300px;
+  }
+
+  /*
+   * 589/531 is a fact about a 1280 panel: it lands the lane's stroke on the
+   * measured x=781. At 753 the same ratio leaves the lane 274px wide and the
+   * measured 80px text inset then eats a third of it, which is what wrapped the
+   * why-making copy onto eleven lines. An even split is the honest reading of a
+   * width the Figma never drew.
+   */
+  .intro {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-48);
+    /*
+     * The overhang exists so the road lands on a measured y=1026. There is no
+     * measured y here, so the copy just sits above its stroke.
+     */
+    --intro-overhang: 0px;
+  }
+
+  /* 254px of copy instead of 168px, which is enough for the heading on one line. */
+  .intro__block[data-block='why'] {
+    padding: var(--space-48) var(--space-24) var(--space-16) var(--space-32);
+  }
+
+  /*
+   * At their measured widths the cut-outs collide here: the girls photograph is
+   * 397px inside a 288px column and its -32px pull would run it 61px into the
+   * lane's left stroke. The measured sizes are a 1280 fact too.
+   */
+  .intro__media[data-slot='tower'] {
+    width: min(100%, 240px);
+    margin-top: 0;
+  }
+
+  .intro__media[data-slot='girls'] {
+    width: min(100%, 260px);
+    margin-left: 0;
+  }
+
+  /*
+   * Tablet has room for neither 592px of photograph nor 480px of decor, so the
+   * measured tracks go back to fractions and both children go fluid.
+   */
+  .origin {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    justify-content: stretch;
+    gap: var(--space-32);
+    margin-left: var(--space-32);
+    padding: var(--space-48) var(--space-32);
+  }
+
+  .origin__photo {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .origin__decor {
+    width: min(100%, 320px);
+    margin-bottom: 0;
+  }
+
+  .origin__body h2 {
+    max-width: none;
+  }
+}
+
+/* Mobile -------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .story-page__title {
+    padding-block: var(--space-32) var(--space-24);
+  }
+
+  .story-hero img {
+    height: 220px;
+  }
+
+  /* The stagger has nowhere to go in one column — stack and keep the order. */
+  .intro {
+    grid-template-columns: 1fr;
+    row-gap: var(--space-48);
+    padding-block: var(--space-48);
+  }
+
+  /*
+   * Every one of these has to carry its attribute selector. `.intro__media` is
+   * (0,1,0) and loses to the (0,2,0) desktop rules however late it appears, so
+   * `grid-column: 2` survived on the tower cut-out and the grid kept an
+   * implicit second column: at 390 the band laid out in 161px + 109px tracks,
+   * with "Our mission" on two lines and the paragraph breaking every four
+   * words. This is the same specificity trap that left a radius clipping the
+   * mobile timeline rail.
+   */
+  .intro__block[data-block='mission'],
+  .intro__block[data-block='why'],
+  .intro__media[data-slot='tower'],
+  .intro__media[data-slot='girls'] {
+    grid-column: 1;
+    grid-row: auto;
+    padding-top: 0;
+    max-width: none;
+    justify-self: start;
+    align-self: auto;
+  }
+
+  /*
+   * Source order is decor, accents, tower, girls, mission, why — both
+   * photographs come before either block, because on desktop the grid places
+   * them by coordinate and source order does not matter. In one column it does,
+   * so this pairs each block with its own photograph. Visual order only; the
+   * DOM is untouched, so nothing changes for a screen reader.
+   */
+  .intro__block[data-block='mission'] {
+    order: 1;
+  }
+
+  .intro__media[data-slot='tower'] {
+    order: 2;
+  }
+
+  .intro__block[data-block='why'] {
+    order: 3;
+  }
+
+  .intro__media[data-slot='girls'] {
+    order: 4;
+  }
+
+  /* 320 less a 20px gutter each side is 280px of column at the narrowest. */
+  .intro__media[data-slot='tower'],
+  .intro__media[data-slot='girls'] {
+    margin: 0;
+    width: min(100%, 320px);
+  }
+
+  /*
+   * The rail moves out to meet the card, not the other way round: it keeps the
+   * reading width, and it lands the timeline's content on exactly the same
+   * inset as the card's own copy — 16px of panel, 10 of stroke, 24 of padding.
+   * Measured at 390 the card's stroke sat at x=16..26 and the rail at x=36..46,
+   * a 20px jog in what is meant to be one continuous road.
+   */
+  .story-page__journey {
+    padding-inline: 0;
+  }
+
+  /*
+   * Closed on all four corners the left border curved away 16px above the
+   * card's own bottom and the rail restarted below it, so the line read as a
+   * box that closes and a separate stroke that begins. Square at the
+   * bottom-left, and the left border runs straight on into the rail.
+   */
+  .origin {
+    grid-template-columns: 1fr;
+    gap: var(--space-24);
+    margin: var(--space-32) 0 0;
+    padding: var(--space-32) var(--space-24);
+    border-right: var(--road-width) solid var(--road-color);
+    border-radius: var(--road-radius) var(--road-radius) var(--road-radius) 0;
+  }
+
+  /*
+   * The card grows a right border here, but the dashed centre line still
+   * carried `border-right: 0` from the desktop rule — three sides dashed and
+   * the fourth plain green.
+   */
+  .origin::before {
+    inset: calc(var(--road-width) / -2 - 1px);
+    border-right: var(--road-dash-width) dashed var(--road-dash);
+    border-radius: calc(var(--road-radius) - var(--road-width) / 2)
+      calc(var(--road-radius) - var(--road-width) / 2)
+      calc(var(--road-radius) - var(--road-width) / 2) 0;
+  }
+
+  .origin__cut::before,
+  .origin__cut::after {
+    display: none;
+  }
+
+  .intro__block[data-block='why'] {
+    align-self: auto;
+    margin-right: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .intro__block[data-block='why']::before,
+  .intro__elbow {
+    display: none;
+  }
+}

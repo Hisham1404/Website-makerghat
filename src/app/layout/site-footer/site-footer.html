@@ -1,0 +1,71 @@
+<footer class="site-footer">
+  <!-- MakerGhat's own skyline artwork (footer.svg), CC BY-SA 4.0. -->
+  <img class="site-footer__skyline" src="assets/footer.svg" alt="" aria-hidden="true" />
+
+  <div class="site-footer__inner container">
+    <div class="site-footer__connect">
+      <h2 class="site-footer__title"><span>Connect</span> <span>with Us</span></h2>
+
+      <a class="site-footer__lead" [routerLink]="leadLink.href">{{ leadLink.label }}</a>
+
+      <ul class="site-footer__contact" role="list">
+        <li>
+          <img [src]="contact.phone.icon" alt="" aria-hidden="true" width="21" height="21" />
+          <a [href]="contact.phone.href">{{ contact.phone.label }}</a>
+        </li>
+        <li>
+          <img [src]="contact.email.icon" alt="" aria-hidden="true" width="21" height="21" />
+          <a [href]="contact.email.href">{{ contact.email.label }}</a>
+        </li>
+      </ul>
+    </div>
+
+    @for (column of columns; track column.heading) {
+      <div class="site-footer__column">
+        <h2>{{ column.heading }}</h2>
+        <ul role="list">
+          @for (link of column.links; track link.href + link.label) {
+            <li><a [routerLink]="link.href">{{ link.label }}</a></li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="site-footer__brand">
+      <a class="site-footer__home" routerLink="/">
+        <img src="assets/logo-footer.svg" alt="MakerGhat — home" width="170" height="79" />
+      </a>
+
+      <a
+        class="site-footer__newsletter"
+        [href]="newsletter.href"
+        target="_blank"
+        rel="noopener noreferrer"
+      >{{ newsletter.label }}</a>
+
+      <hr class="site-footer__rule" />
+
+      <ul class="site-footer__social" role="list">
+        @for (social of socials; track social.href) {
+          <li>
+            <a
+              [href]="social.href"
+              [attr.aria-label]="social.label"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <!-- Decorative: the link's aria-label carries the name. -->
+              <img [src]="social.icon" alt="" width="22" height="22" />
+            </a>
+          </li>
+        }
+      </ul>
+
+      <p class="site-footer__licence">
+        @for (line of licence; track line) {
+          <span>{{ line }}</span>
+        }
+      </p>
+    </div>
+  </div>
+</footer>

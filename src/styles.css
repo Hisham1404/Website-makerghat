@@ -1,0 +1,20 @@
+/*
+ * Global stylesheet. Order matters: tokens define the vocabulary, the reset
+ * clears the ground, then typography and layout build on both.
+ */
+@import './styles/tokens.css';
+@import './styles/reset.css';
+@import './styles/typography.css';
+@import './styles/layout.css';
+
+/*
+ * Measured from the Figma export (design/ourstory-figma.jpg): the page ground is
+ * white and the content sits on a cream panel 1280px wide, centred — x=80..1360
+ * in the 1440 frame. Painting the whole page cream, as this file used to, loses
+ * the white margins the design actually has.
+ */
+body {
+  min-height: 100vh;
+  background: var(--color-white);
+  font-family: var(--font-parkinsans);
+}

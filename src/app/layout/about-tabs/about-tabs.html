@@ -1,0 +1,21 @@
+<div class="section-tabs__bleed">
+  <nav class="section-tabs" aria-label="About Us sections">
+    <ul>
+      @for (tab of tabs; track tab.path) {
+        <li>
+          <a
+            [routerLink]="tab.path"
+            [attr.data-tone]="tab.tone"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="is-current"
+            ariaCurrentWhenActive="page"
+          >{{ tab.label }}</a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="section-tabs__panel">
+    <router-outlet />
+  </div>
+</div>

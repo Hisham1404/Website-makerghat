@@ -1,0 +1,183 @@
+<section class="journey" aria-labelledby="journey-heading">
+  <!--
+    The Figma has no visible heading here — the timeline flows straight out of
+    the origin box. Screen-reader users still get a named region.
+  -->
+  <h2 id="journey-heading" class="visually-hidden">MakerGhat's journey, 2018 to 2026</h2>
+
+  <!--
+    The step out of the origin box. The span is the 33px of flow between the two
+    boxes; the SVG draws the turn across it, because the stroke it comes from
+    belongs to the origin box and the one it leaves into belongs to lane 0, so
+    no single box owns both sides of it.
+
+    Local coordinates: the stub is 10px wide, so its centre line is x=5, the
+    origin's bottom stroke sits on y=-5 and lane 0's top stroke on y=38. The
+    turns are rounded at 16px on the outer edge, which is 11px on this centre
+    line. The horizontals run past the box at both ends to bury the square ends
+    of the two strokes it joins.
+
+    No direction marker here: the export draws ONE coral pair at this joint and
+    .journey__row already provides it. This span carried a second, squashed to
+    10px wide by its own box.
+  -->
+  <span class="journey__lead" aria-hidden="true">
+    <svg class="journey__lead-road" viewBox="0 0 10 33" aria-hidden="true" focusable="false">
+      <path
+        data-road="stroke"
+        d="M-12 -5 H-6 Q5 -5 5 6 V27 Q5 38 16 38 H22"
+        fill="none"
+        stroke="var(--color-green-600)"
+        stroke-width="10"
+      />
+      <path
+        data-road="dash"
+        d="M-12 -5 H-6 Q5 -5 5 6 V27 Q5 38 16 38 H22"
+        fill="none"
+        stroke="var(--color-white)"
+        stroke-width="3"
+        stroke-dasharray="4 4"
+      />
+    </svg>
+  </span>
+
+  <!--
+    The road. One path, drawn over the lanes rather than out of their borders:
+    the export steps down 42px at the lane 1/2 boundary, meanders up-across-down
+    around the 2022 photograph at the lane 2/3 one, runs its right rail from
+    y=2598 to y=3030 across two lanes, and ends at a dot instead of closing.
+    Stacked box borders can express none of that.
+  -->
+  <svg
+    class="journey__road"
+    [attr.viewBox]="road.viewBox"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      data-road="stroke"
+      [attr.d]="road.d"
+      fill="none"
+      stroke="var(--color-green-600)"
+      stroke-width="10"
+      stroke-linecap="round"
+    />
+    <path
+      data-road="dash"
+      [attr.d]="road.d"
+      fill="none"
+      stroke="var(--color-white)"
+      stroke-width="3"
+      stroke-dasharray="4 4"
+      stroke-linecap="butt"
+    />
+    <circle
+      data-road="terminus"
+      [attr.cx]="road.terminus.x"
+      [attr.cy]="road.terminus.y"
+      [attr.r]="road.terminus.r"
+      fill="var(--color-green-600)"
+    />
+    @for (marker of road.markers; track $index) {
+      <path data-road="marker" [attr.d]="marker" fill="var(--color-secondary-500)" />
+    }
+  </svg>
+
+  <ol class="journey__rows">
+    @for (row of rows; track $index) {
+      <li
+        class="journey__row"
+        [attr.data-direction]="row.direction"
+        [attr.data-last]="row.isLast ? '' : null"
+        [style.--lane-h]="row.height"
+      >
+        <!-- Decorative: the dashed centre line of the road. -->
+        <span class="journey__track" aria-hidden="true"></span>
+
+        @if (!row.isLast) {
+          <svg class="journey__marker" viewBox="0 0 22 12" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M0 0l7 6-7 6zM11 0l7 6-7 6z" />
+          </svg>
+        }
+
+        <ol class="journey__nodes">
+          @for (node of row.nodes; track node.milestone.id) {
+            @let milestone = node.milestone;
+            <li
+              class="milestone"
+              [attr.data-panel-align]="node.panelAlign"
+              [attr.data-media-side]="milestone.media?.side ?? null"
+            >
+              @if (milestone.decor; as decor) {
+                <img
+                  class="milestone__decor"
+                  [src]="decor.src"
+                  [width]="decor.width"
+                  [height]="decor.height"
+                  [style.--x]="milestone.place.decor?.x"
+                  [style.--y]="milestone.place.decor?.y"
+                  [style.--w]="decor.width"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                />
+              }
+
+              @if (milestone.media; as media) {
+                <img
+                  class="milestone__media"
+                  [src]="media.src"
+                  [alt]="media.alt"
+                  [width]="media.width"
+                  [height]="media.height"
+                  [style.--x]="milestone.place.media?.x"
+                  [style.--y]="milestone.place.media?.y"
+                  [style.--w]="media.width"
+                  loading="lazy"
+                />
+              }
+
+              <!-- Chip and its panel share a positioning context so the panel
+                   hangs from the chip, not from the full-height lane. -->
+              <div
+                class="milestone__disclosure"
+                [style.--x]="milestone.place.chip.x"
+                [style.--y]="milestone.place.chip.y"
+              >
+                <button
+                type="button"
+                class="milestone__chip"
+                [id]="'chip-' + milestone.id"
+                [attr.aria-expanded]="openId() === milestone.id"
+                [attr.aria-controls]="'panel-' + milestone.id"
+                (click)="toggle(milestone.id)"
+              >{{ milestone.year }}<svg
+                  class="milestone__caret"
+                  viewBox="0 0 10 6"
+                  aria-hidden="true"
+                  focusable="false"
+                ><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+              </button>
+
+              <div
+                class="milestone__panel"
+                [id]="'panel-' + milestone.id"
+                role="region"
+                [attr.aria-labelledby]="'chip-' + milestone.id"
+                [hidden]="openId() !== milestone.id"
+              >
+                <ul>
+                  @for (item of milestone.items; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+                </div>
+              </div>
+            </li>
+          }
+        </ol>
+      </li>
+    }
+  </ol>
+</section>

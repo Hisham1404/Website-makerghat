@@ -1,0 +1,200 @@
+.site-footer {
+  position: relative;
+  /* Their skyline artwork is filled #4B3A80, so the body uses the 500 step
+     (#4A3A80) and the silhouette reads as one continuous shape. */
+  background: var(--color-primary-500);
+  color: var(--color-white);
+}
+
+/* Skyline ------------------------------------------------------------- */
+
+.site-footer__skyline {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Kills the sub-pixel hairline where the artwork meets the footer body. */
+  margin-bottom: -1px;
+  background: var(--color-neutral-50);
+}
+
+/* Grid ---------------------------------------------------------------- */
+
+.site-footer__inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 0.9fr 1.1fr;
+  gap: var(--space-48);
+  padding-block: var(--space-48) var(--space-64);
+}
+
+/* Connect column ------------------------------------------------------ */
+
+.site-footer__title {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-24);
+  font-size: var(--font-size-48);
+  line-height: var(--line-height-56);
+  font-weight: var(--font-weight-700);
+  color: var(--color-white);
+}
+
+.site-footer__lead,
+.site-footer__column a,
+.site-footer__contact a {
+  /* inline-block so the 28px line-height becomes a real 28px tap target,
+     clearing the 24x24 WCAG 2.2 minimum for a list of links. */
+  display: inline-block;
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-28);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.site-footer__lead:hover,
+.site-footer__column a:hover,
+.site-footer__contact a:hover {
+  text-decoration: underline;
+}
+
+.site-footer__contact {
+  margin: var(--space-48) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-8);
+}
+
+.site-footer__contact li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.site-footer__contact img {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+}
+
+/* Link columns -------------------------------------------------------- */
+
+.site-footer__column h2 {
+  margin-bottom: var(--space-16);
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-600);
+  color: var(--color-white);
+}
+
+.site-footer__column ul {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-8);
+}
+
+/* Brand column -------------------------------------------------------- */
+
+.site-footer__brand {
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  gap: var(--space-24);
+}
+
+.site-footer__home {
+  display: block;
+  text-decoration: none;
+}
+
+.site-footer__home img {
+  width: 150px;
+  height: auto;
+}
+
+.site-footer__newsletter {
+  padding: var(--space-12) var(--space-24);
+  border-radius: var(--radius-pill);
+  background: var(--color-secondary-500);
+  color: var(--color-secondary-900);
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-600);
+  text-decoration: none;
+}
+
+.site-footer__newsletter:hover {
+  background: var(--color-secondary-400);
+}
+
+.site-footer__rule {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--color-primary-400);
+}
+
+.site-footer__social {
+  display: flex;
+  gap: var(--space-16);
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer__social a {
+  /* Padding then negative margin: the hit area grows to 34px without moving
+     the glyph or opening gaps in the row. */
+  display: inline-flex;
+  padding: var(--space-8);
+  margin: calc(var(--space-8) * -1);
+}
+
+.site-footer__social img {
+  width: 22px;
+  height: 22px;
+}
+
+.site-footer__licence {
+  margin: 0;
+  display: grid;
+  text-align: right;
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-20);
+  color: var(--color-primary-100);
+}
+
+/* Responsive ---------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-32);
+  }
+
+  .site-footer__brand {
+    justify-items: start;
+  }
+
+  .site-footer__licence {
+    text-align: left;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-32);
+    padding-block: var(--space-32) var(--space-48);
+  }
+
+  .site-footer__contact {
+    margin-top: var(--space-24);
+  }
+
+  .site-footer__title {
+    font-size: var(--font-size-36);
+    line-height: var(--line-height-44);
+  }
+}

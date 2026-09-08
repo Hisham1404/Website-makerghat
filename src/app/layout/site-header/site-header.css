@@ -1,0 +1,209 @@
+.site-header {
+  position: relative;
+  z-index: 20;
+  background: var(--color-white);
+}
+
+.site-header__inner {
+  /* The header is wider than the content panel: the logo sits at x=44 in the
+     1440 reference, not at the panel's x=80. */
+  width: min(100% - 88px, 1440px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-24);
+  min-height: 72px;
+}
+
+/* Logo ---------------------------------------------------------------- */
+
+.site-header__home {
+  display: block;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.site-header__home img {
+  width: 110px;
+  height: auto;
+}
+
+/* Nav ----------------------------------------------------------------- */
+
+.site-header__nav > ul {
+  display: flex;
+  align-items: center;
+  gap: var(--space-24);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-header__nav > ul > li {
+  position: relative;
+}
+
+.site-header__nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-block: var(--space-8);
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-400);
+  color: var(--color-black);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__nav > ul > li > a:hover {
+  color: var(--color-primary-500);
+}
+
+.site-header__caret {
+  width: 10px;
+  height: 6px;
+}
+
+/* Dropdowns ----------------------------------------------------------- */
+
+.site-header__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  min-width: 200px;
+  margin: 0;
+  padding: var(--space-8) 0;
+  list-style: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  box-shadow: 0 8px 24px var(--color-black-20);
+
+  /* Hidden but still in the layout, so :focus-within can reveal it. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(var(--space-4));
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    visibility 120ms;
+}
+
+.site-header__nav > ul > li:hover > .site-header__dropdown,
+.site-header__nav > ul > li:focus-within > .site-header__dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.site-header__nav > ul > li[data-menu-align='right'] > .site-header__dropdown {
+  left: auto;
+  right: 0;
+}
+
+.site-header__dropdown a {
+  display: block;
+  padding: var(--space-8) var(--space-16);
+  width: 100%;
+}
+
+.site-header__dropdown a:hover {
+  background: var(--color-primary-50);
+  color: var(--color-primary-500);
+}
+
+/* Mobile toggle ------------------------------------------------------- */
+
+.site-header__toggle {
+  display: none;
+  order: 3;
+  /* WCAG 2.2 asks for 24x24 minimum; 44x44 is the comfortable thumb target. */
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  padding: var(--space-8);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.site-header__bars,
+.site-header__bars::before,
+.site-header__bars::after {
+  display: block;
+  width: 24px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-500);
+}
+
+.site-header__bars {
+  position: relative;
+}
+
+.site-header__bars::before,
+.site-header__bars::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.site-header__bars::before {
+  top: -7px;
+}
+
+.site-header__bars::after {
+  top: 7px;
+}
+
+/* Below the tablet breakpoint the nav becomes a drawer ----------------- */
+
+@media (max-width: 1023px) {
+  .site-header__toggle {
+    display: grid;
+  }
+
+  .site-header__nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    padding: var(--space-16);
+    background: var(--color-white);
+    box-shadow: 0 12px 24px var(--color-black-20);
+  }
+
+  .site-header__nav.is-open {
+    display: block;
+  }
+
+  .site-header__nav > ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .site-header__nav a {
+    padding: var(--space-12) 0;
+    font-size: var(--font-size-18);
+  }
+
+  /* No hover affordance on touch — dropdowns are simply always expanded. */
+  .site-header__dropdown {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    padding: 0 0 var(--space-8) var(--space-16);
+    min-width: 0;
+    transition: none;
+  }
+
+  .site-header__caret {
+    display: none;
+  }
+}

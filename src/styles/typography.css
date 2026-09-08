@@ -1,0 +1,78 @@
+/*
+ * Global typography. Sizes come from the inherited scale; nothing here declares
+ * a raw px font-size, so the whole page can be re-scaled from tokens.css alone.
+ *
+ * Measured from the live site: the page heading is Parkinsans 48px in
+ * --color-primary-500; body copy and card text are Outfit 18/24.
+ */
+
+body {
+  font-family: var(--font-parkinsans);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-400);
+  line-height: var(--line-height-24);
+  color: var(--color-primary-900);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-parkinsans);
+  font-weight: var(--font-weight-600);
+  color: var(--color-primary-500);
+}
+
+h1 {
+  font-size: var(--font-size-48);
+  line-height: var(--line-height-56);
+}
+
+h2 {
+  font-size: var(--font-size-36);
+  line-height: var(--line-height-44);
+}
+
+h3 {
+  font-size: var(--font-size-28);
+  line-height: var(--line-height-36);
+}
+
+h4 {
+  font-size: var(--font-size-22);
+  line-height: var(--line-height-30);
+}
+
+p {
+  font-family: var(--font-outfit);
+  font-size: var(--font-size-18);
+  line-height: var(--line-height-24);
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: var(--font-size-36);
+    line-height: var(--line-height-44);
+  }
+
+  h2 {
+    font-size: var(--font-size-28);
+    line-height: var(--line-height-36);
+  }
+
+  h3 {
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-32);
+  }
+}
+
+@media (max-width: 500px) {
+  h1 {
+    font-size: var(--font-size-32);
+    line-height: var(--line-height-36);
+  }
+
+  p {
+    font-size: var(--font-size-16);
+  }
+}
