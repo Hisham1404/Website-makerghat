@@ -2,7 +2,7 @@
 
 A recreation of the MakerGhat **Our Story** page from its Figma design, built with Angular 22.
 
-- **Live demo:** _(deployment pending — see [Deployment](#deployment))_
+- **Live demo:** <https://makerghatdemo.vercel.app/about-us/our-story>
 - **Design source:** [Figma — MG Our Story](https://www.figma.com/design/11QoixG96b31FhhVDYiteD/MG-Our-Story-?node-id=7278-16487)
 - **Live reference site:** <https://makerghat.org/about-us/our-story>
 
@@ -206,15 +206,18 @@ colliding with a stylesheet this repo does not control.
 
 ## Deployment
 
+**Live:** <https://makerghatdemo.vercel.app/about-us/our-story> (Vercel)
+
 The production build is a fully static bundle:
 
 ```bash
 npm run build          # → dist/our-story/browser
 ```
 
-Host it on any static host with a **single-page-app rewrite** — every path must
-serve `index.html` so deep links like `/about-us/our-story` resolve client-side.
-On Netlify that is one line in `_redirects`:
+It needs a host with a **single-page-app rewrite**, so that deep links like
+`/about-us/our-story` serve `index.html` and resolve client-side rather than
+404ing. On Vercel that is one rule in `vercel.json`; the Netlify equivalent is a
+single line in `_redirects`:
 
 ```
 /*  /index.html  200
