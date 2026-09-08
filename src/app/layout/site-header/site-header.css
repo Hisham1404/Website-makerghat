@@ -205,14 +205,25 @@
    * plus the footer's licence line. --color-on-primary-muted is the first tone
    * up the ramp that clears it, at 4.53:1.
    */
+  /*
+   * The panel itself does not scroll — the link list inside it does. Their
+   * `.menu` is a fixed 522px box with `overflow: hidden` that never scrolls,
+   * because their rows are ~21px and all 25 links fit; the artwork then sits
+   * at y=542 and is always on screen.
+   *
+   * Rows here are 40-48px for the touch-target reason above, so the content is
+   * 1291px in an 812px panel and it cannot all fit. Scrolling the whole panel
+   * put the artwork ~480px below the fold and took the logo and close button
+   * with it. Scrolling only the list keeps their layout: chrome on top,
+   * artwork on the floor, the middle moves.
+   */
   .site-header__nav {
     position: fixed;
     inset: 0;
     z-index: 100;
     display: none;
     padding: var(--space-24);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
     background: var(--color-primary-500);
   }
 
@@ -233,6 +244,7 @@
 
   .site-header__drawer-top {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
     margin-bottom: var(--space-32);
@@ -255,10 +267,17 @@
     cursor: pointer;
   }
 
+  /* The one part that moves. `min-height: 0` or a flex child refuses to
+     shrink below its content and the overflow never engages. */
   .site-header__nav > ul {
+    flex: 1;
+    /* A floor, so the artwork can never squeeze the list out of existence. */
+    min-height: 120px;
     flex-direction: column;
     align-items: flex-end;
     gap: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     text-align: right;
   }
 
@@ -278,14 +297,29 @@
   }
 
   /*
-   * The artwork sits on the floor of the panel — `margin-top: auto` inside the
-   * column flex, so a short menu still pins it to the bottom and a long one
-   * simply scrolls to it.
+   * The artwork sits on the floor of the panel and stays there. It used to
+   * carry `margin-top: auto` to push itself down when the content was short;
+   * the list flexing to fill does that now, and an auto margin would fight it.
+   * The negative side margins bleed it to the panel edges past the 24px padding.
+   */
+  /*
+   * Capped, because its height follows the panel's WIDTH — it is `width: 100%`
+   * on a fixed aspect. Measured at 667x375, a phone in landscape, it rendered
+   * 569px tall in a 375px panel and squeezed the link list to ZERO: the menu
+   * could not be used at all. A height media query would not have caught that,
+   * since the trigger is the width.
+   *
+   * `align-items: flex-end` clips the crop off the TOP, which keeps the hands
+   * sitting on the panel floor — they are the part worth seeing.
    */
   .site-header__drawer-art {
     position: relative;
-    display: block;
-    margin: auto calc(var(--space-24) * -1) calc(var(--space-24) * -1);
+    display: flex;
+    align-items: flex-end;
+    flex-shrink: 0;
+    max-height: 32vh;
+    overflow: hidden;
+    margin: 0 calc(var(--space-24) * -1) calc(var(--space-24) * -1);
     padding-top: var(--space-32);
   }
 

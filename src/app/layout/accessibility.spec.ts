@@ -208,3 +208,84 @@ describe('the drawer behaves like the overlay it is', () => {
     expect(event.defaultPrevented).toBe(false);
   });
 });
+
+/*
+ * The drawer scrolls in the wrong place.
+ *
+ * Their `.menu` is a fixed 522px box with `overflow: hidden` and it never
+ * scrolls, because their rows are about 21px and all 25 links fit. The
+ * artwork then sits immediately below it at y=542 and is always on screen.
+ *
+ * Ours cannot copy that. Rows here are 40-48px, for the touch-target reason
+ * recorded in mobile-chrome.spec.ts, so the content is 1291px in an 812px
+ * panel. With the whole panel scrolling, the artwork sat ~480px below the fold
+ * and the top chrome scrolled away with it.
+ *
+ * So the structure their layout implies, rather than the numbers it uses: the
+ * panel itself does not scroll, the logo and close stay put, the artwork stays
+ * on the floor, and the LINK LIST is the one part that scrolls.
+ */
+describe('the drawer scrolls its links, not itself', () => {
+  const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+
+  it('stops the panel itself from scrolling', () => {
+    const body = cssRule(drawer, '.site-header__nav');
+    expect(body).toMatch(/overflow:\s*hidden/);
+    expect(body).not.toMatch(/overflow-y:\s*auto/);
+  });
+
+  it('makes the link list the scroll container', () => {
+    const body = cssRule(drawer, '.site-header__nav > ul');
+    expect(body).toMatch(/flex:\s*1/);
+    expect(body).toMatch(/overflow-y:\s*auto/);
+    expect(body).toMatch(/overscroll-behavior:\s*contain/);
+  });
+
+  /* Both must keep their height while the list takes the slack. */
+  it('holds the top chrome and the artwork against the flex squeeze', () => {
+    expect(cssRule(drawer, '.site-header__drawer-top')).toMatch(/flex-shrink:\s*0/);
+    expect(cssRule(drawer, '.site-header__drawer-art')).toMatch(/flex-shrink:\s*0/);
+  });
+
+  /*
+   * `margin-top: auto` was what pinned the artwork to the floor when the
+   * content was short. The list flexing to fill does that job now, and leaving
+   * the auto margin in would fight it.
+   */
+  it('drops the auto margin now the list fills the space', () => {
+    expect(cssRule(drawer, '.site-header__drawer-art')).not.toMatch(/margin:\s*auto/);
+  });
+});
+
+/*
+ * ...and the artwork has to yield when there is no room for it.
+ *
+ * Its height follows the panel's WIDTH — it is `width: 100%` on a fixed
+ * aspect — so a wide, short viewport makes it enormous. Measured at 667x375
+ * (a phone in landscape) it rendered 569px tall in a 375px panel and the link
+ * list collapsed to ZERO height: the menu could not be used at all.
+ *
+ * A height-only media query does not cover this, because the trigger is the
+ * width. Capping the artwork in vh does, and clipping from the top keeps the
+ * part that matters — the hands sit at its bottom edge.
+ */
+describe('the drawer stays usable on short screens', () => {
+  const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+
+  it('caps the artwork against the viewport height', () => {
+    const body = cssRule(drawer, '.site-header__drawer-art');
+    expect(body).toMatch(/max-height:\s*\d+vh/);
+    expect(body).toMatch(/overflow:\s*hidden/);
+  });
+
+  /* Clipped from the top, so the hands at the bottom survive the crop. */
+  it('crops the illustration from the top, not the bottom', () => {
+    const body = cssRule(drawer, '.site-header__drawer-art');
+    expect(body).toMatch(/align-items:\s*flex-end/);
+  });
+
+  /* Belt and braces: the list keeps a floor even when the cap still bites. */
+  it('guarantees the link list a minimum height', () => {
+    expect(cssRule(drawer, '.site-header__nav > ul')).toMatch(/min-height:\s*\d+px/);
+  });
+});

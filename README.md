@@ -14,7 +14,7 @@ A recreation of the MakerGhat **Our Story** page from its Figma design, built wi
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Match the Figma design closely                       | Every coordinate is **measured** off the 1440×4503 export, not eyeballed — see [Development approach](#development-approach) |
 | Fully responsive: desktop, tablet, mobile            | Three strategies, one per range — [Responsive strategy](#responsive-strategy)                                                |
-| Clean, maintainable, well-structured code            | Data-driven components, no magic numbers without a cited measurement, 332 tests                                              |
+| Clean, maintainable, well-structured code            | Data-driven components, no magic numbers without a cited measurement, 339 tests                                              |
 | Good coding standards and best practices             | Standalone zoneless components, `OnPush`, typed data modules, semantic landmarks, WCAG-sized touch targets                   |
 | Compatible with the existing makerghat.org structure | Their own design tokens are inherited verbatim — [Compatibility](#compatibility-with-makerghatorg)                           |
 
@@ -27,7 +27,7 @@ Requires **Node 22.22+** (developed on 24.20).
 ```bash
 npm install
 npm start      # dev server on http://localhost:4200
-npm test       # 332 unit tests (Vitest)
+npm test       # 339 unit tests (Vitest)
 npm run build  # production bundle into dist/our-story/browser
 ```
 
@@ -131,7 +131,7 @@ The whole composition then scales with the panel instead of being pinned to 1280
 
 ### Testing
 
-332 tests, run with `npm test`. They are not coverage theatre — they pin the
+339 tests, run with `npm test`. They are not coverage theatre — they pin the
 **measurements** so a later tidy-up cannot quietly undo them, and each one cites
 the number it protects. A representative example:
 
@@ -215,7 +215,21 @@ to close, decorative artwork at `aria-hidden` / `alt=""`, and
 
 **One deliberate divergence from makerghat.org:** their drawer's menu rows are
 about 21px tall. That is below the 24×24 minimum this build holds itself to, so
-ours are 40–48px and the menu scrolls rather than fitting one screen.
+ours are 40–48px and all 20 links cannot fit one screen the way their 25 do.
+
+Their layout still dictates the structure, though. Their `.menu` is a fixed
+522px box with `overflow: hidden` that never scrolls, and the artwork sits
+immediately under it, always on screen. So here the **panel does not scroll and
+neither does its chrome** — the logo, the close button and the illustration stay
+put, and the **link list alone** is the scroll container. Scrolling the whole
+panel instead, as this first did, pushed the artwork ~480px below the fold and
+took the close button with it.
+
+The illustration is capped at `32vh`. Its height follows the panel's _width_, so
+on a phone in landscape (667×375) it rendered **569px tall inside a 375px panel
+and squeezed the link list to zero** — the menu could not be used at all. A
+height media query would not have caught that, because the trigger is the width.
+It now crops from the top, which keeps the hands sitting on the panel floor.
 
 **Known limitation:** `:focus` styles could not be verified at runtime in the
 automation used here — the browser pane never holds document focus, so `:focus`
