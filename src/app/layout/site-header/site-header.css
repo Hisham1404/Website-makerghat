@@ -125,6 +125,14 @@
   list-style: none;
 }
 
+/*
+ * Drawer chrome — off entirely above 1023, where this element is a menu bar.
+ */
+.site-header__drawer-top,
+.site-header__drawer-art {
+  display: none;
+}
+
 /* Mobile toggle ------------------------------------------------------- */
 
 .site-header__toggle {
@@ -184,30 +192,104 @@
     display: grid;
   }
 
+  /*
+   * Their drawer, measured off the opened menu at 375: a full-height panel in
+   * #4A3A80 with the links right-aligned. It covers the viewport rather than
+   * hanging under the header, which is why the close control lives inside it.
+   *
+   * Every colour here was already in the token file — #4A3A80 is
+   * --color-primary-500, the parent links' #F1EEF9 is --color-primary-50 and
+   * the children's #AEA6C6 is --color-primary-100. Nothing new was needed,
+   * which is a fair check on the palette having been read off their stylesheet
+   * correctly to begin with.
+   */
   .site-header__nav {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
     display: none;
-    padding: var(--space-16);
-    background: var(--color-white);
-    box-shadow: 0 12px 24px var(--color-black-20);
+    padding: var(--space-24);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--color-primary-500);
   }
 
   .site-header__nav.is-open {
-    display: block;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site-header__drawer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-32);
+  }
+
+  .site-header__drawer-logo {
+    width: 97px;
+    height: auto;
+  }
+
+  .site-header__close {
+    display: grid;
+    place-items: center;
+    /* Same 44x44 thumb target the toggle uses. */
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--space-8);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
   }
 
   .site-header__nav > ul {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-end;
     gap: 0;
+    text-align: right;
+  }
+
+  .site-header__nav > ul > li {
+    width: 100%;
   }
 
   .site-header__nav a {
+    justify-content: flex-end;
     padding: var(--space-12) 0;
-    font-size: var(--font-size-18);
+    font-size: var(--font-size-16);
+    color: var(--color-primary-50);
+  }
+
+  .site-header__nav > ul > li > a:hover {
+    color: var(--color-white);
+  }
+
+  /*
+   * The artwork sits on the floor of the panel — `margin-top: auto` inside the
+   * column flex, so a short menu still pins it to the bottom and a long one
+   * simply scrolls to it.
+   */
+  .site-header__drawer-art {
+    position: relative;
+    display: block;
+    margin: auto calc(var(--space-24) * -1) calc(var(--space-24) * -1);
+    padding-top: var(--space-32);
+  }
+
+  .site-header__drawer-art img:first-child {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .site-header__drawer-art img:last-child {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 93%;
+    height: auto;
+    transform: translateX(-50%);
   }
 
   /* No hover affordance on touch — dropdowns are simply always expanded. */
@@ -216,10 +298,25 @@
     opacity: 1;
     visibility: visible;
     transform: none;
+    background: transparent;
     box-shadow: none;
-    padding: 0 0 var(--space-8) var(--space-16);
+    padding: 0;
     min-width: 0;
     transition: none;
+  }
+
+  /* Children read a step quieter than their parent, as on their site. */
+  .site-header__dropdown a,
+  .site-header__subnav a {
+    padding: var(--space-8) 0;
+    font-size: var(--font-size-14);
+    color: var(--color-primary-100);
+  }
+
+  .site-header__dropdown a:hover,
+  .site-header__subnav a:hover {
+    background: transparent;
+    color: var(--color-primary-50);
   }
 
   .site-header__caret {
@@ -232,11 +329,12 @@
 @media (max-width: 767px) {
   .site-header__subnav {
     display: block;
-    padding: 0 0 var(--space-8) var(--space-16);
+    padding: 0;
   }
 
-  .site-header__subnav a {
-    padding: var(--space-12) 0;
-    font-size: var(--font-size-16);
-  }
+  /*
+   * Size and colour come from the shared child rule above — this block must not
+   * restate `font-size`, or it wins on source order and puts the sub-links back
+   * to the parent's 16px when their site draws them at 14.
+   */
 }

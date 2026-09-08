@@ -29,6 +29,33 @@
       aria-label="Main"
       (click)="closeMenu()"
     >
+      <!--
+        Drawer chrome. Hidden above 1023, where this same element is the
+        horizontal menu bar. The panel covers the whole viewport once open, so
+        the header's own toggle is underneath it — the drawer has to carry its
+        own close control or there is no way back out but Escape.
+
+        Their drawer uses the ORANGE lockup, not the header's purple one; same
+        pairing as the footer.
+      -->
+      <div class="site-header__drawer-top">
+        <img
+          class="site-header__drawer-logo"
+          src="assets/logo-footer.svg"
+          alt="MakerGhat"
+          width="97"
+          height="45"
+        />
+        <button
+          type="button"
+          class="site-header__close"
+          aria-label="Close menu"
+          (click)="closeMenu()"
+        >
+          <img src="assets/menu-close.svg" alt="" width="17" height="17" aria-hidden="true" />
+        </button>
+      </div>
+
       <ul>
         @for (item of navItems; track item.label; let last = $last) {
           <!-- The final menu hangs from its trigger's right edge; left-aligned
@@ -73,6 +100,17 @@
           </li>
         }
       </ul>
+
+      <!--
+        The illustration their drawer is anchored on: a cream landform with the
+        hands resting in it. Two separate files on their site, stacked, and
+        purely decorative. drawer-hand.svg is a 149 kB traced illustration, so
+        it is lazy — nothing about opening a menu should wait on it.
+      -->
+      <div class="site-header__drawer-art" aria-hidden="true">
+        <img src="assets/drawer-art.svg" alt="" width="360" height="290" loading="lazy" />
+        <img src="assets/drawer-hand.svg" alt="" width="334" height="146" loading="lazy" />
+      </div>
     </nav>
   </div>
 </header>

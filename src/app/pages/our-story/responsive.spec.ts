@@ -120,17 +120,27 @@ describe('intro band — tablet', () => {
 
 describe('the mobile road is one line', () => {
   /*
-   * Measured at 390: the origin card's left stroke is at x=16..26 because the
-   * card is full-bleed to the panel, while the timeline's rail is at x=36..46
-   * because its wrapper carries `panel-inset`. A 20px jog in what is supposed
-   * to be one continuous road.
+   * The invariant: the origin card's left stroke and the timeline's rail land
+   * on the same x, or the road has a visible jog in it. Measured at 390 they
+   * once sat at x=16..26 and x=36..46, 20px apart.
    *
-   * The rail moves out to meet the card rather than the card moving in: it
-   * keeps the reading width, and it lands the timeline's content on exactly the
-   * same inset as the card's own copy (16 + 10 of stroke + 24 of padding = 50).
+   * This used to be enforced by pulling BOTH out to the panel edge — a zero
+   * side margin on the card and `padding-inline: 0` on the journey wrapper —
+   * which worked only while the panel was itself inset by a 16px gutter. The
+   * panel is full-bleed now, so that left the stroke against the viewport edge.
+   * They still have to agree; they now agree on `--panel-pad` instead of on 0.
+   *
+   * The card needs a MARGIN because its stroke is drawn on its own border box,
+   * and the journey needs no rule at all — it keeps the `.panel-inset` padding
+   * it already had.
    */
-  it('drops the wrapper inset so the rail meets the origin card', () => {
-    expect(cssRule(mobile, '.story-page__journey')).toMatch(/padding-inline:\s*0/);
+  it('insets the origin card by exactly what the rail is inset by', () => {
+    expect(cssRule(mobile, '.origin')).toMatch(/margin:\s*var\(--space-32\) var\(--panel-pad\) 0/);
+    expect(mobile).not.toMatch(/\.story-page__journey\s*\{[^}]*padding-inline:\s*0/);
+    const layoutCss = stripComments(
+      readFileSync(join(root, 'src/styles/layout.css'), 'utf8'),
+    );
+    expect(cssRule(layoutCss, '.panel-inset')).toMatch(/padding-inline:\s*var\(--panel-pad\)/);
   });
 
   /*

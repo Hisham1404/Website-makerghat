@@ -592,26 +592,23 @@
   }
 
   /*
-   * The rail moves out to meet the card, not the other way round: it keeps the
-   * reading width, and it lands the timeline's content on exactly the same
-   * inset as the card's own copy — 16px of panel, 10 of stroke, 24 of padding.
-   * Measured at 390 the card's stroke sat at x=16..26 and the rail at x=36..46,
-   * a 20px jog in what is meant to be one continuous road.
-   */
-  .story-page__journey {
-    padding-inline: 0;
-  }
-
-  /*
-   * Closed on all four corners the left border curved away 16px above the
-   * card's own bottom and the rail restarted below it, so the line read as a
-   * box that closes and a separate stroke that begins. Square at the
-   * bottom-left, and the left border runs straight on into the rail.
+   * The card's stroke and the rail below it have to land on the same x or the
+   * road has a jog in it — measured at 390 they once sat at x=16..26 and
+   * x=36..46, 20px apart. That used to be fixed by pulling BOTH out to the
+   * panel edge: `padding-inline: 0` here and a zero side margin on `.origin`.
+   *
+   * That only worked while the panel was itself inset by a 16px gutter. The
+   * panel is full-bleed now, so pulling them to its edge puts the green stroke
+   * hard against the viewport and the line reads as clipped. They still move
+   * together; they just move together 20px in. The journey simply keeps the
+   * `.panel-inset` padding it already had, and `.origin` takes the same figure
+   * as a MARGIN — its stroke is drawn on its own border box, so padding cannot
+   * move it.
    */
   .origin {
     grid-template-columns: 1fr;
     gap: var(--space-24);
-    margin: var(--space-32) 0 0;
+    margin: var(--space-32) var(--panel-pad) 0;
     padding: var(--space-32) var(--space-24);
     border-right: var(--road-width) solid var(--road-color);
     border-radius: var(--road-radius) var(--road-radius) var(--road-radius) 0;

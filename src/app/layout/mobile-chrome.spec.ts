@@ -209,3 +209,149 @@ describe('hamburger — their geometry exactly', () => {
     expect(cssRule(headerCss, '.site-header__bars::after')).toMatch(/top:\s*7px/);
   });
 });
+
+/*
+ * Round two, both raised by Mohammed looking at the phone build next to
+ * makerghat.org.
+ *
+ * A. THE ROAD WAS LEFT ON THE SCREEN EDGE. Taking the cream full-bleed removed
+ *    the 16px the panel's gutter used to supply, and two rules were relying on
+ *    it: `.story-page__journey { padding-inline: 0 }` and `.origin`'s zero side
+ *    margin. Both existed to stop a 20px jog between the origin card's stroke
+ *    and the rail below it — they aligned the two by pulling BOTH out to the
+ *    panel edge. With the panel now at x=0 that put the green stroke hard
+ *    against the viewport, so the line read as clipped. They still have to move
+ *    together; they just have to move together 20px in.
+ *
+ * B. THE DRAWER WAS A PLAIN WHITE SHEET. Theirs is a full-height purple panel
+ *    with the orange lockup, an X, right-aligned links and an illustration
+ *    anchored at the bottom. Measured off their opened menu at 375:
+ *
+ *      panel        .mobile-menu   #4A3A80        = --color-primary-500
+ *      parent link  16px           #F1EEF9        = --color-primary-50
+ *      child link   14px           #AEA6C6        = --color-primary-100
+ *      logo         Logo_2.svg     96.8x45 at x=35 y=25
+ *      close        hamburger_close.svg 25x25 at x=330 y=35
+ *      artwork      mobile_footer.svg 360x290 + bottom_right_1.svg 334x146
+ *
+ *    Every one of those three colours was already in the token file, which is
+ *    a decent check on the palette having been read off their stylesheet
+ *    correctly in the first place.
+ */
+
+describe('the road keeps its margin now the cream is full-bleed', () => {
+  const storyCss = read('src/app/pages/our-story/our-story.css');
+  const phone = storyCss.slice(storyCss.indexOf('@media (max-width: 767px)'));
+
+  /*
+   * The rail is a `.panel-inset` child, so deleting the override is what gives
+   * it the inset back — 20px on a phone, the same figure the copy above it uses.
+   */
+  it('stops zeroing the journey’s inset', () => {
+    expect(phone).not.toMatch(/\.story-page__journey\s*\{[^}]*padding-inline:\s*0/);
+  });
+
+  /*
+   * The card's stroke is drawn on its own border box, so padding cannot move
+   * it — only a margin can. Same value as the rail's padding, or the joint
+   * between the two jogs, which is the bug the old rule was written to fix.
+   */
+  it('moves the origin card in by the same amount, so the joint stays straight', () => {
+    const body = cssRule(phone, '.origin');
+    expect(body).toMatch(/margin:\s*var\(--space-32\) var\(--panel-pad\) 0/);
+  });
+});
+
+describe('mobile drawer — their panel, not a white sheet', () => {
+  let fixture: import('@angular/core/testing').ComponentFixture<SiteHeader>;
+  let el: HTMLElement;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SiteHeader],
+      providers: [provideRouter([])],
+    }).compileComponents();
+    fixture = TestBed.createComponent(SiteHeader);
+    await fixture.whenStable();
+    el = fixture.nativeElement as HTMLElement;
+  });
+
+  const drawerMobile = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+
+  it('carries the orange lockup, not the header’s purple one', () => {
+    const logo = el.querySelector('.site-header__drawer-logo');
+    expect(logo?.getAttribute('src')).toBe('assets/logo-footer.svg');
+  });
+
+  it('has its own close control, because the panel covers the toggle', () => {
+    const close = el.querySelector('.site-header__close');
+    expect(close).not.toBeNull();
+    expect(close?.getAttribute('aria-label')).toBeTruthy();
+    expect(close?.querySelector('img')?.getAttribute('src')).toBe('assets/menu-close.svg');
+  });
+
+  it('closes the drawer when that control is used', () => {
+    const toggle = el.querySelector<HTMLButtonElement>('.site-header__toggle')!;
+    toggle.click();
+    fixture.detectChanges();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+    el.querySelector<HTMLButtonElement>('.site-header__close')!.click();
+    fixture.detectChanges();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('anchors both illustrations at the bottom, decorative only', () => {
+    const art = el.querySelector('.site-header__drawer-art')!;
+    expect(art.getAttribute('aria-hidden')).toBe('true');
+    const srcs = [...art.querySelectorAll('img')].map((i) => i.getAttribute('src'));
+    expect(srcs).toEqual(['assets/drawer-art.svg', 'assets/drawer-hand.svg']);
+  });
+
+  /* 149 kB of traced illustration has no business blocking anything. */
+  it('loads the artwork lazily', () => {
+    for (const img of el.querySelectorAll('.site-header__drawer-art img')) {
+      expect(img.getAttribute('loading')).toBe('lazy');
+    }
+  });
+
+  it('hides the drawer furniture on desktop, where the nav is a menu bar', () => {
+    const body = groupedRule(headerCss, [
+      '.site-header__drawer-top',
+      '.site-header__drawer-art',
+    ]);
+    expect(body).toMatch(/display:\s*none/);
+  });
+
+  it('fills the screen in their purple once open', () => {
+    const body = cssRule(drawerMobile, '.site-header__nav');
+    expect(body).toMatch(/position:\s*fixed/);
+    expect(body).toMatch(/inset:\s*0/);
+    expect(body).toMatch(/background:\s*var\(--color-primary-500\)/);
+  });
+
+  it('right-aligns the links, as theirs does', () => {
+    expect(cssRule(drawerMobile, '.site-header__nav > ul')).toMatch(/align-items:\s*flex-end/);
+  });
+
+  /* Parent 16px on --color-primary-50, children 14px on --color-primary-100. */
+  it('uses their two link tones, both already in the palette', () => {
+    expect(cssRule(drawerMobile, '.site-header__nav a')).toMatch(
+      /color:\s*var\(--color-primary-50\)/,
+    );
+    const child = groupedRule(drawerMobile, [
+      '.site-header__dropdown a',
+      '.site-header__subnav a',
+    ]);
+    expect(child).toMatch(/color:\s*var\(--color-primary-100\)/);
+    expect(child).toMatch(/font-size:\s*var\(--font-size-14\)/);
+  });
+});
+
+describe('drawer assets are actually in the repo', () => {
+  it('ships the close icon and both illustrations', () => {
+    for (const file of ['menu-close.svg', 'drawer-art.svg', 'drawer-hand.svg']) {
+      expect(() => readFileSync(join(root, 'public/assets', file))).not.toThrow();
+    }
+  });
+});
