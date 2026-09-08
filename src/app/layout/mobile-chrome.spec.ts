@@ -271,7 +271,7 @@ describe('mobile drawer — their panel, not a white sheet', () => {
     el = fixture.nativeElement as HTMLElement;
   });
 
-  const drawerMobile = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+  const drawerMobile = headerCss.slice(headerCss.indexOf('@media (max-width: 879px)'));
 
   it('carries the orange lockup, not the header’s purple one', () => {
     const logo = el.querySelector('.site-header__drawer-logo');
@@ -348,5 +348,57 @@ describe('drawer assets are actually in the repo', () => {
     for (const file of ['menu-close.svg', 'drawer-art.svg', 'drawer-hand.svg']) {
       expect(() => readFileSync(join(root, 'public/assets', file))).not.toThrow();
     }
+  });
+});
+
+/*
+ * Where the hamburger belongs, and where its mark sits.
+ *
+ * 1. IT WAS SHOWING ON DESKTOP. This build swapped the nav for a drawer below
+ *    1024, so at 900 and 1000 it showed a hamburger where makerghat.org shows
+ *    the full nav — theirs switches somewhere between 821 and 840.
+ *
+ *    The breakpoint is measured here rather than copied off them, because our
+ *    nav is not their nav. Ours needs logo 110 + gap 24 + items 650 = 784px of
+ *    inner width, and .site-header__inner reserves 88px of gutter, so the nav
+ *    stops fitting below 872px. 880 is that, rounded up off the cliff edge.
+ *
+ * 2. THE MARK SAT TOO FAR LEFT ON A PHONE. Their hamburger's ink is 20px from
+ *    the screen edge; ours was 56. The header inner carries a 44px gutter —
+ *    which is a DESKTOP measurement, the logo's x=44 in the 1440 reference —
+ *    and on a 375 screen that is far too much room to give away.
+ *
+ *    Their logo sits 30px from the left, so the phone gutter becomes 30. The
+ *    button then hangs past it: it is a 44x44 touch target with a 20px mark
+ *    centred in it, so 12px of slack sits either side of the ink, and the
+ *    target has to overhang for the MARK rather than the box to line up.
+ */
+describe('the hamburger appears where it should, and sits where it should', () => {
+  it('hands the nav back a viewport wide enough to hold it', () => {
+    expect(headerCss).toMatch(/@media \(max-width: 879px\)/);
+    expect(headerCss).not.toMatch(/@media \(max-width: 1023px\)/);
+  });
+
+  /* Hidden by default, shown only inside the drawer block. */
+  it('shows the toggle only below that breakpoint', () => {
+    expect(cssRule(headerCss, '.site-header__toggle')).toMatch(/display:\s*none/);
+    const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 879px)'));
+    expect(cssRule(drawer, '.site-header__toggle')).toMatch(/display:\s*grid/);
+  });
+
+  /* 88px of gutter is the 1440 reference's, and far too much on a phone. */
+  it('narrows the header gutter on a phone', () => {
+    const phone = headerCss.slice(headerCss.indexOf('@media (max-width: 767px)'));
+    expect(cssRule(phone, '.site-header__inner')).toMatch(/width:\s*min\(100% - 60px, 1440px\)/);
+  });
+
+  /*
+   * 30px gutter, 12px of slack inside the target, and the ink wanted on 20:
+   * 30 - 22 + 12 = 20. Hanging the target out is what keeps it 44x44 while the
+   * mark lines up.
+   */
+  it('hangs the target past the gutter so the mark lands on 20px', () => {
+    const phone = headerCss.slice(headerCss.indexOf('@media (max-width: 767px)'));
+    expect(cssRule(phone, '.site-header__toggle')).toMatch(/margin-right:\s*-22px/);
   });
 });
