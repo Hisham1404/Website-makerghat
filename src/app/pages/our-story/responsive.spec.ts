@@ -147,25 +147,29 @@ describe('the mobile road is one line', () => {
   });
 
   /*
-   * With all four corners rounded the card's left border curves away 16px above
-   * its own bottom and the rail restarts below it, so the line reads as a box
-   * that closes and a separate stroke that begins. Squaring the bottom-left
-   * runs the left border straight into the rail.
+   * On a phone this card is a complete enclosure — all four sides, all four
+   * corners — and the road leaves it from the CENTRE of the bottom edge rather
+   * than from a corner. So no corner needs squaring: nothing continues out of
+   * one. On the desktop artboard the same card's horizontal edges are partial
+   * instead, because there the road runs along part of each.
    */
-  it('squares the corner the rail continues through', () => {
-    expect(cssRule(mobile, '.origin')).toMatch(
-      /border-radius:\s*var\(--road-radius\) var\(--road-radius\) var\(--road-radius\) 0/,
-    );
+  it('encloses the card and rounds every corner', () => {
+    const body = cssRule(mobile, '.origin');
+    expect(body).toMatch(/border-radius:\s*var\(--road-radius\)\s*;/);
+    expect(body).toMatch(/border-right:\s*var\(--road-width\) solid var\(--road-color\)/);
+    expect(body).toMatch(/border-bottom:\s*var\(--road-width\) solid var\(--road-color\)/);
   });
 
   /*
-   * The card grows a right border on mobile but `.origin::before` — the white
-   * dashed centre line — still carries `border-right: 0` from the desktop rule,
-   * so three sides of the card were dashed and the fourth was plain green.
+   * The dashed centre line has to mirror whichever sides the stroke draws, or
+   * some edges read dashed and others plain green — the desktop rule leaves
+   * `border-right: 0` on it, which is right up there and wrong down here.
+   * The card is closed on a phone, so the dash goes all the way round with it.
    */
-  it('carries the dashed centre line onto the border mobile adds', () => {
+  it('mirrors the dashed centre line to the sides the stroke actually draws', () => {
     const body = cssRule(mobile, '.origin::before');
-    expect(body).toMatch(/border-right:\s*var\(--road-dash-width\) dashed var\(--road-dash\)/);
+    expect(body).toMatch(/border:\s*var\(--road-dash-width\) dashed var\(--road-dash\)/);
+    expect(body).not.toMatch(/border-right:\s*0/);
   });
 
   /*
@@ -182,6 +186,6 @@ describe('the mobile road is one line', () => {
     const body = cssRule(timelineCss, '.journey::after');
     expect(body).toMatch(/border-radius:\s*50%/);
     expect(body).toMatch(/background:\s*var\(--road-color\)/);
-    expect(body).toMatch(/width:\s*26px/);
+    expect(body).toMatch(/width:\s*var\(--road-dot\)/);
   });
 });

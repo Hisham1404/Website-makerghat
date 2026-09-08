@@ -1,4 +1,4 @@
-<section class="journey" aria-labelledby="journey-heading" [attr.data-road-end-side]="roadEndSide">
+<section class="journey" aria-labelledby="journey-heading">
   <!--
     The Figma has no visible heading here — the timeline flows straight out of
     the origin box. Screen-reader users still get a named region.
@@ -100,13 +100,11 @@
               [attr.data-panel-align]="node.panelAlign"
               [attr.data-media-side]="milestone.media?.side ?? null"
               [attr.data-road-side]="node.roadSide"
-              [attr.data-road-start]="node.isRoadStart ? '' : null"
-              [attr.data-road-end]="node.isRoadEnd ? '' : null"
             >
               <!--
                 Below 768 the road is drawn from the milestone's own borders,
                 one turn per milestone: .milestone::before is the green stroke,
-                this span is its white dashed centre line, and the marker sits
+                this span is its white dashed centre line, and the dot sits
                 on the horizontal this milestone shares with the next one. All
                 three come off above the breakpoint, where the artboard's <svg>
                 owns the whole path.
@@ -114,14 +112,7 @@
               <span class="journey__track" aria-hidden="true"></span>
 
               @if (!node.isRoadEnd) {
-                <svg
-                  class="journey__marker"
-                  viewBox="0 0 22 12"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path fill="currentColor" d="M0 0l7 6-7 6zM11 0l7 6-7 6z" />
-                </svg>
+                <span class="journey__marker" aria-hidden="true"></span>
               }
 
               @if (milestone.decor; as decor) {

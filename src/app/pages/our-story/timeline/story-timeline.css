@@ -42,9 +42,17 @@
   --road-step-drop: 33px;
   --road-step-x: calc(100% * 576 / 1184);
   position: relative;
-  /* Stroke measured at 11 rows of solid colour: 10 CSS px. */
-  --road-width: 10px;
+  /*
+   * 6px, not the export's 10. Ten is a measurement of a 1280 panel; on a 375
+   * screen the same stroke is 2.7% of the width instead of 0.8% and reads as a
+   * pipe rather than a road. The dash drops with it to keep the 3:1 proportion,
+   * which is what makes it read as a centre line rather than a gap. Restored to
+   * the measured 10px on the artboard below.
+   */
+  --road-width: 6px;
   --road-radius: 32px;
+  /* One size for the joint dots and the terminus — they are the same mark. */
+  --road-dot: 18px;
   /*
    * The radius the CENTRE line turns at. A 3px dash sitting on the middle of a
    * 10px stroke is 5px inside the outer edge, so its corner is 5px tighter —
@@ -55,7 +63,7 @@
   --road-color: var(--color-green-600);
   /* Centre line: white dots ~4px wide, 3px tall, on an 8px period. */
   --road-dash: var(--color-white);
-  --road-dash-width: 3px;
+  --road-dash-width: 2px;
   padding-block: 0 var(--space-96);
 }
 
@@ -78,7 +86,13 @@
   display: block;
   width: var(--road-width);
   height: var(--road-step-drop);
-  margin-left: 0;
+  /*
+   * The road leaves the origin card from the CENTRE of its bottom edge. The
+   * first milestone box spans 0..50%, so the right-hand end of its top border
+   * sits exactly under this drop: the road lands there, runs left along it and
+   * turns down the rail. Half a stroke back puts the bar's centre on 50%.
+   */
+  margin-left: calc(50% - var(--road-width) / 2);
   background: var(--road-color);
 }
 
@@ -138,26 +152,19 @@
 .journey::after {
   content: '';
   position: absolute;
+  /*
+   * The centre, always. The last box is half the panel wide, so its floor ends
+   * at 50% whichever side it is on — a left box's runs 0..50% and a right box's
+   * 50%..100%. The road therefore runs out to the middle and stops there, and
+   * nothing needs to know which rail it finished on.
+   */
+  left: 50%;
   bottom: var(--space-96);
-  width: 26px;
-  height: 26px;
+  width: var(--road-dot);
+  height: var(--road-dot);
   border-radius: 50%;
   background: var(--road-color);
   transform: translate(-50%, 50%);
-}
-
-/*
- * Which rail the road ends on depends on whether the milestone count is odd:
- * nine years alternate left, right, ... and finish on the left, a tenth would
- * finish on the right. The component works it out and says so on the section,
- * so adding 2027 moves the dot without anyone editing this file.
- */
-.journey[data-road-end-side='left']::after {
-  left: calc(var(--road-width) / 2);
-}
-
-.journey[data-road-end-side='right']::after {
-  left: calc(100% - var(--road-width) / 2);
 }
 
 /* Lanes ----------------------------------------------------------------- */
@@ -217,23 +224,11 @@
 }
 
 /*
- * The road arrives down the origin box's own left stroke and continues straight
- * into the first vertical, so the first box draws no top edge — with one, the
- * corner radius curves away from the line coming into it and the joint reads as
- * two strokes that nearly meet.
+ * The last box KEEPS its floor. That border stops at 50% — the box is half the
+ * panel wide — so the road runs out to the centre and the terminus dot sits on
+ * the end of it. It used to be removed so the rail could stop at a dot on the
+ * left edge instead, which left the road ending off to one side.
  */
-.milestone[data-road-start]::before {
-  border-top: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-/* And the last box draws no floor, so the road can stop at its terminus dot. */
-.milestone[data-road-end]::before {
-  border-bottom: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
 
 /*
  * A joint is ONE line, not two stacked. Each box's top border sits inside its
@@ -278,28 +273,18 @@
   border-radius: 0 var(--road-centre-radius) var(--road-centre-radius) 0;
 }
 
-.milestone[data-road-start] .journey__track {
-  border-top: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.milestone[data-road-end] .journey__track {
-  border-bottom: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-/* Direction markers on the shared edges --------------------------------- */
+/* Joint markers ---------------------------------------------------------- */
 
 /*
  * One per joint, centred on the horizontal the milestone shares with the next.
- * `bottom: 5px` puts the glyph's own bottom edge on the stroke's centre line
- * and the transform then straddles it.
+ * `bottom` puts the dot's own bottom edge on the stroke's centre line and the
+ * transform then straddles it.
  *
- * The rotation is not decoration: the road comes DOWN a left box's vertical, so
- * it leaves along the joint below heading RIGHT. Below a right box it is
- * heading left, and the same glyph has to turn around.
+ * A solid circle, the same mark the road ends on, replacing the coral direction
+ * chevrons the export draws. The chevrons say which way the road is travelling,
+ * which is a useful thing to say on the desktop artboard where the path wanders;
+ * on a phone the road is a plain alternating snake and the arrows read as
+ * clutter.
  */
 .journey__marker {
   position: absolute;
@@ -307,15 +292,12 @@
   left: 50%;
   bottom: calc(var(--road-width) / 2);
   display: block;
-  width: 26px;
-  height: 14px;
-  color: var(--color-secondary-500);
+  width: var(--road-dot);
+  height: var(--road-dot);
+  border-radius: 50%;
+  background: var(--road-color);
   transform: translate(-50%, 50%);
   pointer-events: none;
-}
-
-.milestone[data-road-side='right'] .journey__marker {
-  transform: translate(-50%, 50%) rotate(180deg);
 }
 
 /* Nodes inside a lane --------------------------------------------------- */
@@ -344,7 +326,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  /* Centred in the lane rather than hugging the left rail. */
+  align-items: center;
   gap: var(--space-16);
   /*
    * 24px of inset clears the 10px stroke on whichever side the box is closed,
@@ -384,8 +367,18 @@
   pointer-events: none;
 }
 
+/*
+ * The chip and its panel share this wrapper, and it has to centre them itself.
+ * `.milestone` centring its children is not enough: closed, this box is the
+ * chip's own 156px; open, it grows to the panel's 287px and a plain block
+ * leaves the narrower chip sitting on its left edge — measured drifting from
+ * x=187.5 to 122 the moment a year was opened.
+ */
 .milestone__disclosure {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .milestone__chip {
@@ -619,6 +612,9 @@
 @media (min-width: 768px) {
   .journey {
     container-type: inline-size;
+    /* Back to the export's measured stroke; the 6px above is a phone decision. */
+    --road-width: 10px;
+    --road-dash-width: 3px;
   }
 
   .journey__road {
@@ -666,6 +662,20 @@
   .journey__row {
     height: calc(var(--lane-h) / 1184 * 100cqw);
     min-height: 0;
+  }
+
+  /*
+   * The phone road pulls every box up by one stroke so its top border lands on
+   * the previous box's bottom one. Up here the road is a drawn <svg> with fixed
+   * geometry and nothing wants pulling anywhere — left in, it put every row
+   * after the first 10px high CUMULATIVELY (row 4 was 40px above its measured
+   * lane top, against a road that had not moved) and stretched the second
+   * milestone of each row by 10px, because a negative top margin on a box with
+   * both `top` and `bottom` pinned moves it AND resizes it.
+   */
+  .milestone + .milestone,
+  .journey__row + .journey__row {
+    margin-top: 0;
   }
 
   .journey__nodes {

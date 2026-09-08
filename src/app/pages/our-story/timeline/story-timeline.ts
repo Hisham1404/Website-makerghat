@@ -30,9 +30,10 @@ interface TimelineNode {
    * CHIPS_PER_ROW is even — true today at 2, and a coincidence, not a rule.
    */
   readonly roadSide: 'left' | 'right';
-  /** First milestone: the road arrives here, so its box draws no top edge. */
-  readonly isRoadStart: boolean;
-  /** Last milestone: the road stops here, so its box draws no bottom edge. */
+  /**
+   * Last milestone. The joint markers sit on the horizontal a milestone shares
+   * with the NEXT one, so the last has no joint to mark — it has the terminus.
+   */
   readonly isRoadEnd: boolean;
 }
 
@@ -96,22 +97,12 @@ export class StoryTimeline {
             panelAlign: (i === rightMost && milestones.length > 1 ? 'right' : 'left') as
               'left' | 'right',
             roadSide: (overall % 2 === 0 ? 'left' : 'right') as 'left' | 'right',
-            isRoadStart: overall === 0,
             isRoadEnd: overall === MILESTONES.length - 1,
           };
         }),
       };
     },
   );
-
-  /**
-   * Which rail the road finishes on below 768, which is where the terminus dot
-   * has to sit. Nine milestones alternate to an odd count and end on the left;
-   * a tenth would end on the right, and this makes the CSS follow rather than
-   * needing a hand edit.
-   */
-  protected readonly roadEndSide: 'left' | 'right' =
-    (MILESTONES.length - 1) % 2 === 0 ? 'left' : 'right';
 
   /**
    * The road, as one path. Above the artboard breakpoint the lanes draw no

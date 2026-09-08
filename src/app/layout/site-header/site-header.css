@@ -185,9 +185,19 @@
   top: 7px;
 }
 
-/* Below the tablet breakpoint the nav becomes a drawer ----------------- */
+/* Below the width the nav actually needs, it becomes a drawer ----------- */
 
-@media (max-width: 1023px) {
+/*
+ * 880, not 1024. This build swapped the nav for a drawer below 1024, so at 900
+ * and 1000 it showed a hamburger where makerghat.org shows the whole nav —
+ * theirs turns over somewhere between 821 and 840.
+ *
+ * The number is measured against OUR nav rather than copied off theirs: logo
+ * 110 + gap 24 + items 650 = 784px of inner width, and .site-header__inner
+ * reserves 88px of gutter, so the nav stops fitting below 872px. 880 rounds
+ * that up off the cliff edge.
+ */
+@media (max-width: 879px) {
   .site-header__toggle {
     display: grid;
   }
@@ -373,6 +383,27 @@
 /* Below the tab-bar breakpoint the About Us sections move into the drawer --- */
 
 @media (max-width: 767px) {
+  /*
+   * 88px of gutter is the 1440 reference's — the logo's measured x=44, doubled
+   * — and on a 375 screen it gives away far too much room: it put the
+   * hamburger's ink 56px from the edge where theirs sits at 20. Their logo is
+   * 30px in, so that is the phone gutter.
+   */
+  .site-header__inner {
+    width: min(100% - 60px, 1440px);
+  }
+
+  /*
+   * The mark lines up, not the box. This is a 44x44 touch target with a 20px
+   * mark centred in it, so 12px of slack sits either side of the ink; against
+   * a 30px gutter the ink would land at 42. Hanging the target 22px past the
+   * gutter puts the ink on 20 — 30 - 22 + 12 — without shrinking the target
+   * below the size a thumb needs.
+   */
+  .site-header__toggle {
+    margin-right: -22px;
+  }
+
   .site-header__subnav {
     display: block;
     padding: 0;

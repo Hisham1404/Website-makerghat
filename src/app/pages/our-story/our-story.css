@@ -608,12 +608,28 @@
    * move it.
    */
   .origin {
+    /*
+     * The timeline thins its stroke to 6px on a phone, and this card draws the
+     * same road with its own tokens — leaving it at 10 would put a step in the
+     * line at the joint between them.
+     */
+    --road-width: 6px;
+    --road-dash-width: 2px;
     grid-template-columns: 1fr;
     gap: var(--space-24);
     margin: var(--space-32) var(--panel-pad) 0;
     padding: var(--space-32) var(--space-24);
+    /*
+     * Fully enclosed on a phone: all four sides, all four corners. That is a
+     * deliberate departure from the desktop artboard, where this card's top and
+     * bottom edges are PARTIAL because the road runs along part of each and
+     * carries on out of frame. Here the card is where the road begins, so it
+     * reads better as a complete box that the road then leaves — and it leaves
+     * from the centre of the bottom edge, not from a corner.
+     */
     border-right: var(--road-width) solid var(--road-color);
-    border-radius: var(--road-radius) var(--road-radius) var(--road-radius) 0;
+    border-bottom: var(--road-width) solid var(--road-color);
+    border-radius: var(--road-radius);
   }
 
   /*
@@ -621,14 +637,19 @@
    * carried `border-right: 0` from the desktop rule — three sides dashed and
    * the fourth plain green.
    */
+  /* The dashed centre line runs the whole way round with the stroke. */
   .origin::before {
     inset: calc(var(--road-width) / -2 - 1px);
-    border-right: var(--road-dash-width) dashed var(--road-dash);
-    border-radius: calc(var(--road-radius) - var(--road-width) / 2)
-      calc(var(--road-radius) - var(--road-width) / 2)
-      calc(var(--road-radius) - var(--road-width) / 2) 0;
+    border: var(--road-dash-width) dashed var(--road-dash);
+    border-radius: calc(var(--road-radius) - var(--road-width) / 2);
   }
 
+  /*
+   * Nothing is cut back. Both of this card's horizontal edges are PARTIAL on
+   * the desktop artboard, because the road runs along part of each and carries
+   * on out of frame; on a phone the card is a complete enclosure and the road
+   * leaves it from the centre of the bottom edge instead.
+   */
   .origin__cut::before,
   .origin__cut::after {
     display: none;

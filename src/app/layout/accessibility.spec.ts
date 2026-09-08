@@ -109,7 +109,7 @@ describe('contrast — computed from the tokens, not eyeballed', () => {
 
 describe('focus is visible everywhere, including on the drawer', () => {
   it('draws a ring that is not the drawer’s own background colour', () => {
-    const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+    const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 879px)'));
     const body = cssRule(drawer, '.site-header__nav :focus-visible');
     expect(body).toMatch(/outline-color:\s*var\(--color-white\)/);
   });
@@ -226,7 +226,7 @@ describe('the drawer behaves like the overlay it is', () => {
  * on the floor, and the LINK LIST is the one part that scrolls.
  */
 describe('the drawer scrolls its links, not itself', () => {
-  const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+  const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 879px)'));
 
   it('stops the panel itself from scrolling', () => {
     const body = cssRule(drawer, '.site-header__nav');
@@ -270,7 +270,7 @@ describe('the drawer scrolls its links, not itself', () => {
  * part that matters — the hands sit at its bottom edge.
  */
 describe('the drawer stays usable on short screens', () => {
-  const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 1023px)'));
+  const drawer = headerCss.slice(headerCss.indexOf('@media (max-width: 879px)'));
 
   it('caps the artwork against the viewport height', () => {
     const body = cssRule(drawer, '.site-header__drawer-art');

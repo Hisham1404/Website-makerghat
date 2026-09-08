@@ -144,3 +144,43 @@ describe('lane artboard — measured', () => {
     expect(rule('.milestone__disclosure')).toMatch(/pointer-events:\s*auto/);
   });
 });
+
+/*
+ * The mobile road's joint pull-up must not reach the artboard.
+ *
+ * Below 768 the road is drawn from each milestone's own borders, and every box
+ * is pulled up by one stroke width so its top border lands ON the previous
+ * box's bottom border — `.milestone + .milestone` and `.journey__row +
+ * .journey__row` both carry `margin-top: calc(var(--road-width) * -1)`.
+ *
+ * Those are base rules, so without a reset they apply up here too, where the
+ * road is a drawn <svg> with fixed geometry and nothing wants pulling anywhere.
+ * Measured at 1440 before the reset:
+ *
+ *   - every row after the first sat 10px high, CUMULATIVELY — row 4 was 40px
+ *     above its measured lane top while the drawn road stayed put;
+ *   - the second milestone in each row sat 10px high and rendered 10px taller,
+ *     because a negative top margin on a box with both `top` and `bottom`
+ *     pinned moves it AND stretches it.
+ *
+ * So 2025's photograph was 40px out and 2019's 10px, against a road that had
+ * not moved. This is the artboard's own geometry being quietly overridden by a
+ * phone rule, which is exactly what the reset below exists to stop.
+ */
+describe('the artboard is not pulled about by the mobile road', () => {
+  it('resets the joint pull-up on both the rows and the milestones', () => {
+    const body = groupedRule(artboard, [
+      '.milestone + .milestone',
+      '.journey__row + .journey__row',
+    ]);
+    expect(body).toMatch(/margin-top:\s*0/);
+  });
+
+  /* The rule it has to beat, so the two stay findable together. */
+  it('leaves the phone rule itself alone', () => {
+    const mobile = css.slice(0, css.indexOf('@media (min-width: 768px)'));
+    expect(
+      groupedRule(mobile, ['.milestone + .milestone', '.journey__row + .journey__row']),
+    ).toMatch(/margin-top:\s*calc\(var\(--road-width\) \* -1\)/);
+  });
+});

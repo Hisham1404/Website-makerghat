@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { rule as cssRule, stripComments } from '../../../testing/css-rules';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -69,5 +72,47 @@ describe('AboutTabs', () => {
   it('does not render a tab for Awards, which the Figma omits', async () => {
     const tabs = await tabsAfterNavigating('/about-us/our-story');
     expect(tabs.map((a) => a.textContent!.trim())).not.toContain('Awards');
+  });
+});
+
+/*
+ * The cream panel carries an edge shadow on makerghat.org, which this build
+ * had missed. Their `.tab-content` is `class="shadow-inline tab-content"` and
+ * computes:
+ *
+ *   rgba(0,0,0,0.15) 2px 0 2px 0, rgba(0,0,0,0.15) -2px 0 2px 0
+ *
+ * Two shadows, both with ZERO vertical offset — one thrown right, one thrown
+ * left — so the panel gets a soft edge down each side and reads as a sheet
+ * lifted off the white page, with nothing under its top or bottom. The tab
+ * links carry the same pair, so a tab and the panel it sits on share an edge.
+ */
+describe('the cream panel is lifted off the page, as theirs is', () => {
+  const tabsCss = readFileSync(
+    join(__dirname, '../../../../src/app/layout/about-tabs/about-tabs.css'),
+    'utf8',
+  );
+
+  const SHADOW =
+    /box-shadow:\s*2px 0 2px 0 var\(--color-black-15\),\s*-2px 0 2px 0 var\(--color-black-15\)/;
+  const clean = stripComments(tabsCss);
+
+  /*
+   * Scoped to each rule's own body. A first pass matched the whole stylesheet,
+   * so deleting the PANEL's shadow still passed on the tab link's copy of it —
+   * the mutation run caught that, which is what it is for.
+   */
+  it('lifts the panel off the page', () => {
+    expect(cssRule(clean, '.section-tabs__panel')).toMatch(SHADOW);
+  });
+
+  it('gives the tabs the same pair, so tab and panel share an edge', () => {
+    expect(cssRule(clean, '.section-tabs a')).toMatch(SHADOW);
+  });
+
+  /* A y-offset would darken the seam where the tab bar meets the panel, and
+     theirs deliberately has none — both offsets are zero. */
+  it('throws the shadow sideways only, never up or down', () => {
+    expect(clean).not.toMatch(/box-shadow:[^;]*0 2px 2px/);
   });
 });

@@ -133,9 +133,16 @@ describe('the step from the origin box into lane 0', () => {
     expect(rule(timelineCss, '.journey')).toMatch(/position:\s*relative/);
   });
 
-  /* Below 768 the road is one straight left rail, so the stub joins it there. */
-  it('puts the stub on the left rail on mobile', () => {
-    expect(rule(timelineCss, '.journey__lead')).toMatch(/margin-left:\s*0/);
+  /*
+   * Below 768 the road leaves the origin card from the CENTRE of its bottom
+   * edge. The first milestone box spans 0..50%, so the right-hand end of its
+   * top border sits exactly under the drop — the road lands there, runs left
+   * and turns down the rail. Half a stroke back centres the bar itself on 50%.
+   */
+  it('drops the stub from the card’s centre on mobile', () => {
+    expect(rule(timelineCss, '.journey__lead')).toMatch(
+      /margin-left:\s*calc\(50% - var\(--road-width\) \/ 2\)/,
+    );
   });
 
   /*

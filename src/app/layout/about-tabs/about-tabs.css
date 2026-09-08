@@ -52,7 +52,11 @@
   margin-left: -30px;
 }
 
+/* The tabs carry the same pair, so a tab and its panel share one edge. */
 .section-tabs a {
+  box-shadow:
+    2px 0 2px 0 var(--color-black-15),
+    -2px 0 2px 0 var(--color-black-15);
   display: block;
   padding: 15px var(--space-48);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -89,10 +93,21 @@
   font-weight: var(--font-weight-600);
 }
 
-/* Top-left is square because the first tab sits on it. */
+/*
+ * Top-left is square because the first tab sits on it.
+ *
+ * The edge shadow is theirs — `.tab-content` on makerghat.org is
+ * `class="shadow-inline tab-content"` and computes two shadows with ZERO
+ * vertical offset, one thrown right and one thrown left. That lifts the cream
+ * sheet off the white page down each side while leaving its top and bottom
+ * edges clean, which is what lets the tabs sit flush on it.
+ */
 .section-tabs__panel {
   background: var(--color-neutral-50);
   border-top-right-radius: var(--radius-lg);
+  box-shadow:
+    2px 0 2px 0 var(--color-black-15),
+    -2px 0 2px 0 var(--color-black-15);
 }
 
 @media (max-width: 1023px) {
