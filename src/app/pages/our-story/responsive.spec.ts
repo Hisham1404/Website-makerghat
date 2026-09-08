@@ -182,6 +182,6 @@ describe('the mobile road is one line', () => {
     const body = cssRule(timelineCss, '.journey::after');
     expect(body).toMatch(/border-radius:\s*50%/);
     expect(body).toMatch(/background:\s*var\(--road-color\)/);
-    expect(body).toMatch(/width:\s*26px/);
+    expect(body).toMatch(/width:\s*var\(--road-dot\)/);
   });
 });

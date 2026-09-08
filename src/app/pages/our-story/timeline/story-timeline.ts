@@ -105,15 +105,6 @@ export class StoryTimeline {
   );
 
   /**
-   * Which rail the road finishes on below 768, which is where the terminus dot
-   * has to sit. Nine milestones alternate to an odd count and end on the left;
-   * a tenth would end on the right, and this makes the CSS follow rather than
-   * needing a hand edit.
-   */
-  protected readonly roadEndSide: 'left' | 'right' =
-    (MILESTONES.length - 1) % 2 === 0 ? 'left' : 'right';
-
-  /**
    * The road, as one path. Above the artboard breakpoint the lanes draw no
    * borders at all — this replaces them, because the export's road steps at one
    * boundary, meanders around a photograph at another, runs a rail across two

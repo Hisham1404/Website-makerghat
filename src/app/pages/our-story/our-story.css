@@ -608,6 +608,13 @@
    * move it.
    */
   .origin {
+    /*
+     * The timeline thins its stroke to 6px on a phone, and this card draws the
+     * same road with its own tokens — leaving it at 10 would put a step in the
+     * line at the joint between them.
+     */
+    --road-width: 6px;
+    --road-dash-width: 2px;
     grid-template-columns: 1fr;
     gap: var(--space-24);
     margin: var(--space-32) var(--panel-pad) 0;
