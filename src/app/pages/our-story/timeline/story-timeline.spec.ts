@@ -178,7 +178,7 @@ describe('StoryTimeline — year chips as disclosures', () => {
     }
   });
 
-  it('opens a year and lists exactly that year\'s milestones', async () => {
+  it("opens a year and lists exactly that year's milestones", async () => {
     await open('2020');
 
     expect(chip('2020').getAttribute('aria-expanded')).toBe('true');
@@ -258,9 +258,9 @@ describe('StoryTimeline — panel alignment', () => {
 
   it('leaves a lone chip hanging left — it cannot overflow', () => {
     const last = [...el.querySelectorAll('.journey__row')].at(-1)!;
-    expect([...last.querySelectorAll('.milestone')].map((m) => m.getAttribute('data-panel-align'))).toEqual([
-      'left',
-    ]);
+    expect(
+      [...last.querySelectorAll('.milestone')].map((m) => m.getAttribute('data-panel-align')),
+    ).toEqual(['left']);
   });
 });
 

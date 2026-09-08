@@ -157,7 +157,10 @@ describe('the step from the origin box into lane 0', () => {
   });
 
   it('paints the step as stroke plus white dashed centre, like every lane', () => {
-    const html = readFileSync(join(root, 'src/app/pages/our-story/timeline/story-timeline.html'), 'utf8');
+    const html = readFileSync(
+      join(root, 'src/app/pages/our-story/timeline/story-timeline.html'),
+      'utf8',
+    );
     const svg = html.slice(html.indexOf('journey__lead-road'), html.indexOf('</svg>'));
     expect(svg).toContain('viewBox="0 0 10 33"');
     expect(svg.match(/d="M-12 -5 H-6 Q5 -5 5 6 V27 Q5 38 16 38 H22"/g)).toHaveLength(2);
@@ -170,7 +173,10 @@ describe('the step from the origin box into lane 0', () => {
    * second, and its own 10px box squashed the 26px glyph to 10px wide.
    */
   it('leaves the joint marker to the row, not the stub', () => {
-    const html = readFileSync(join(root, 'src/app/pages/our-story/timeline/story-timeline.html'), 'utf8');
+    const html = readFileSync(
+      join(root, 'src/app/pages/our-story/timeline/story-timeline.html'),
+      'utf8',
+    );
     const lead = html.slice(html.indexOf('<span class="journey__lead"'), html.indexOf('</span>'));
     expect(lead).not.toContain('journey__marker');
     expect(timelineCss).not.toMatch(/\.journey__lead \.journey__marker/);
@@ -206,7 +212,9 @@ describe('lanes are open on one side', () => {
    * final lane may draw one of its own — otherwise the road grows a spare rung.
    */
   it('draws a bottom edge on the last lane only', () => {
-    expect(timelineCss).toMatch(/\.journey__row\[data-last\][^{]*\{[^}]*border-bottom:\s*var\(--road-width\)/);
+    expect(timelineCss).toMatch(
+      /\.journey__row\[data-last\][^{]*\{[^}]*border-bottom:\s*var\(--road-width\)/,
+    );
     expect(rule(timelineCss, '.journey__row')).not.toMatch(/border-bottom:\s*var\(--road-width\)/);
   });
 });
@@ -224,7 +232,9 @@ describe('lane contents — measured positions', () => {
 
   /* Chip fill sampled at #f5ead6 — lighter than the live site's #ead8b5. */
   it('fills the chip with the Figma chip token', () => {
-    expect(rule(timelineCss, '.milestone__chip')).toMatch(/background:\s*var\(--color-neutral-100\)/);
+    expect(rule(timelineCss, '.milestone__chip')).toMatch(
+      /background:\s*var\(--color-neutral-100\)/,
+    );
   });
 
   /*

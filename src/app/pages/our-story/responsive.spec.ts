@@ -23,7 +23,9 @@ import { groupedRule, rule as cssRule, stripComments } from '../../../testing/cs
  */
 
 const root = join(__dirname, '../../../..');
-const pageCss = stripComments(readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'));
+const pageCss = stripComments(
+  readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'),
+);
 const tablet = pageCss.slice(pageCss.indexOf('@media (max-width: 1023px)'));
 const mobile = pageCss.slice(pageCss.indexOf('@media (max-width: 767px)'));
 /* Mobile-first: the timeline's base rules are its narrow ones. */
@@ -31,7 +33,10 @@ const timelineCss = stripComments(
   readFileSync(join(root, 'src/app/pages/our-story/timeline/story-timeline.css'), 'utf8'),
 );
 
-const CUTOUTS = ["'.intro__media[data-slot=\\'tower\\']'", "'.intro__media[data-slot=\\'girls\\']'"];
+const CUTOUTS = [
+  "'.intro__media[data-slot=\\'tower\\']'",
+  "'.intro__media[data-slot=\\'girls\\']'",
+];
 
 describe('intro band — mobile', () => {
   /*
@@ -137,9 +142,7 @@ describe('the mobile road is one line', () => {
   it('insets the origin card by exactly what the rail is inset by', () => {
     expect(cssRule(mobile, '.origin')).toMatch(/margin:\s*var\(--space-32\) var\(--panel-pad\) 0/);
     expect(mobile).not.toMatch(/\.story-page__journey\s*\{[^}]*padding-inline:\s*0/);
-    const layoutCss = stripComments(
-      readFileSync(join(root, 'src/styles/layout.css'), 'utf8'),
-    );
+    const layoutCss = stripComments(readFileSync(join(root, 'src/styles/layout.css'), 'utf8'));
     expect(cssRule(layoutCss, '.panel-inset')).toMatch(/padding-inline:\s*var\(--panel-pad\)/);
   });
 

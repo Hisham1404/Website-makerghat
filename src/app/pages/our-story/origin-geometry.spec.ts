@@ -22,7 +22,9 @@ import { rule as cssRule, stripComments } from '../../../testing/css-rules';
  */
 
 const root = join(__dirname, '../../../..');
-const pageCss = stripComments(readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'));
+const pageCss = stripComments(
+  readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'),
+);
 const rule = (selector: string) => cssRule(pageCss, selector);
 
 describe('origin box — measured', () => {
@@ -92,7 +94,9 @@ describe('origin box — measured', () => {
   /* Tablet has neither the width for 592px of photograph nor for 480 of decor. */
   it('hands the columns back to fractions below 1024', () => {
     const tablet = pageCss.slice(pageCss.indexOf('@media (max-width: 1023px)'));
-    expect(cssRule(tablet, '.origin')).toMatch(/grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1\.2fr\)/);
+    expect(cssRule(tablet, '.origin')).toMatch(
+      /grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1\.2fr\)/,
+    );
     expect(cssRule(tablet, '.origin__photo')).toMatch(/width:\s*100%/);
     expect(cssRule(tablet, '.origin__decor')).toMatch(/width:\s*min\(100%, 320px\)/);
   });

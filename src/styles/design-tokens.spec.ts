@@ -83,12 +83,9 @@ describe('tokens added by this project', () => {
 describe('stylesheet wiring', () => {
   const globalCss = read('src/styles.css');
 
-  it.each(['tokens.css', 'reset.css', 'typography.css', 'layout.css'])(
-    'imports %s',
-    (partial) => {
-      expect(globalCss).toContain(partial);
-    },
-  );
+  it.each(['tokens.css', 'reset.css', 'typography.css', 'layout.css'])('imports %s', (partial) => {
+    expect(globalCss).toContain(partial);
+  });
 
   /*
    * The page ground is white and the cream belongs to the content panel — this
@@ -142,7 +139,10 @@ describe('no colour literals outside the token file', () => {
 
   it('keeps every hex value in tokens.css so the palette has one home', () => {
     const offenders = cssFilesUnder('src')
-      .map((file) => ({ file, hits: withoutComments(read(file)).match(/#[0-9a-fA-F]{3,8}\b/g) ?? [] }))
+      .map((file) => ({
+        file,
+        hits: withoutComments(read(file)).match(/#[0-9a-fA-F]{3,8}\b/g) ?? [],
+      }))
       .filter(({ hits }) => hits.length > 0);
 
     expect(offenders).toEqual([]);

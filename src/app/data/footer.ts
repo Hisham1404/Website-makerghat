@@ -48,7 +48,11 @@ export const FOOTER_LEAD_LINK: FooterLink = {
 
 export const CONTACT = {
   phone: { label: '+91 9447756484', href: 'tel:+919447756484', icon: 'assets/phone.svg' },
-  email: { label: 'info@makerghat.org', href: 'mailto:info@makerghat.org', icon: 'assets/email.svg' },
+  email: {
+    label: 'info@makerghat.org',
+    href: 'mailto:info@makerghat.org',
+    icon: 'assets/email.svg',
+  },
 } as const;
 
 export const NEWSLETTER = {
@@ -62,10 +66,26 @@ export const NEWSLETTER = {
  * their footer has no icon file for it.
  */
 export const SOCIAL_LINKS = [
-  { label: 'MakerGhat on Instagram', icon: 'assets/insta.svg', href: 'https://www.instagram.com/makerghat' },
-  { label: 'MakerGhat on Substack', icon: 'assets/substack.svg', href: 'https://makerghat.substack.com/' },
-  { label: 'MakerGhat on YouTube', icon: 'assets/youtube.svg', href: 'https://youtube.com/@makerghat9609' },
-  { label: 'MakerGhat on LinkedIn', icon: 'assets/linkedin.svg', href: 'https://www.linkedin.com/company/makerghat' },
+  {
+    label: 'MakerGhat on Instagram',
+    icon: 'assets/insta.svg',
+    href: 'https://www.instagram.com/makerghat',
+  },
+  {
+    label: 'MakerGhat on Substack',
+    icon: 'assets/substack.svg',
+    href: 'https://makerghat.substack.com/',
+  },
+  {
+    label: 'MakerGhat on YouTube',
+    icon: 'assets/youtube.svg',
+    href: 'https://youtube.com/@makerghat9609',
+  },
+  {
+    label: 'MakerGhat on LinkedIn',
+    icon: 'assets/linkedin.svg',
+    href: 'https://www.linkedin.com/company/makerghat',
+  },
 ] as const;
 
 export const LICENCE_LINES = [

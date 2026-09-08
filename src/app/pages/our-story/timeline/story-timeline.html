@@ -1,8 +1,4 @@
-<section
-  class="journey"
-  aria-labelledby="journey-heading"
-  [attr.data-road-end-side]="roadEndSide"
->
+<section class="journey" aria-labelledby="journey-heading" [attr.data-road-end-side]="roadEndSide">
   <!--
     The Figma has no visible heading here — the timeline flows straight out of
     the origin box. Screen-reader users still get a named region.
@@ -118,7 +114,12 @@
               <span class="journey__track" aria-hidden="true"></span>
 
               @if (!node.isRoadEnd) {
-                <svg class="journey__marker" viewBox="0 0 22 12" aria-hidden="true" focusable="false">
+                <svg
+                  class="journey__marker"
+                  viewBox="0 0 22 12"
+                  aria-hidden="true"
+                  focusable="false"
+                >
                   <path fill="currentColor" d="M0 0l7 6-7 6zM11 0l7 6-7 6z" />
                 </svg>
               }
@@ -160,32 +161,36 @@
                 [style.--y]="milestone.place.chip.y"
               >
                 <button
-                type="button"
-                class="milestone__chip"
-                [id]="'chip-' + milestone.id"
-                [attr.aria-expanded]="openId() === milestone.id"
-                [attr.aria-controls]="'panel-' + milestone.id"
-                (click)="toggle(milestone.id)"
-              >{{ milestone.year }}<svg
-                  class="milestone__caret"
-                  viewBox="0 0 10 6"
-                  aria-hidden="true"
-                  focusable="false"
-                ><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-              </button>
+                  type="button"
+                  class="milestone__chip"
+                  [id]="'chip-' + milestone.id"
+                  [attr.aria-expanded]="openId() === milestone.id"
+                  [attr.aria-controls]="'panel-' + milestone.id"
+                  (click)="toggle(milestone.id)"
+                >
+                  {{ milestone.year
+                  }}<svg
+                    class="milestone__caret"
+                    viewBox="0 0 10 6"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" />
+                  </svg>
+                </button>
 
-              <div
-                class="milestone__panel"
-                [id]="'panel-' + milestone.id"
-                role="region"
-                [attr.aria-labelledby]="'chip-' + milestone.id"
-                [hidden]="openId() !== milestone.id"
-              >
-                <ul>
-                  @for (item of milestone.items; track item) {
-                    <li>{{ item }}</li>
-                  }
-                </ul>
+                <div
+                  class="milestone__panel"
+                  [id]="'panel-' + milestone.id"
+                  role="region"
+                  [attr.aria-labelledby]="'chip-' + milestone.id"
+                  [hidden]="openId() !== milestone.id"
+                >
+                  <ul>
+                    @for (item of milestone.items; track item) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
                 </div>
               </div>
             </li>

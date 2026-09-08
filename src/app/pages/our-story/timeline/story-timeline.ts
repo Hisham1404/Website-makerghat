@@ -94,8 +94,7 @@ export class StoryTimeline {
           return {
             milestone,
             panelAlign: (i === rightMost && milestones.length > 1 ? 'right' : 'left') as
-              | 'left'
-              | 'right',
+              'left' | 'right',
             roadSide: (overall % 2 === 0 ? 'left' : 'right') as 'left' | 'right',
             isRoadStart: overall === 0,
             isRoadEnd: overall === MILESTONES.length - 1,

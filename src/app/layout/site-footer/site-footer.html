@@ -25,7 +25,9 @@
         <h2>{{ column.heading }}</h2>
         <ul role="list">
           @for (link of column.links; track link.href + link.label) {
-            <li><a [routerLink]="link.href">{{ link.label }}</a></li>
+            <li>
+              <a [routerLink]="link.href">{{ link.label }}</a>
+            </li>
           }
         </ul>
       </div>
@@ -41,7 +43,8 @@
         [href]="newsletter.href"
         target="_blank"
         rel="noopener noreferrer"
-      >{{ newsletter.label }}</a>
+        >{{ newsletter.label }}</a
+      >
 
       <hr class="site-footer__rule" />
 

@@ -78,7 +78,9 @@
             @if (item.children?.length) {
               <ul class="site-header__dropdown">
                 @for (child of item.children; track child.href) {
-                  <li><a [routerLink]="child.href">{{ child.label }}</a></li>
+                  <li>
+                    <a [routerLink]="child.href">{{ child.label }}</a>
+                  </li>
                 }
               </ul>
             }
@@ -93,7 +95,9 @@
             @if (item.drawerChildren?.length) {
               <ul class="site-header__subnav">
                 @for (child of item.drawerChildren; track child.href) {
-                  <li><a [routerLink]="child.href">{{ child.label }}</a></li>
+                  <li>
+                    <a [routerLink]="child.href">{{ child.label }}</a>
+                  </li>
                 }
               </ul>
             }

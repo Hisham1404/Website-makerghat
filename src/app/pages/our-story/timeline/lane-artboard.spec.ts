@@ -74,14 +74,17 @@ describe('lane artboard — measured', () => {
     expect(m!.place.chip.y).toBe(want.chip[1] - LANE_TOP[want.lane]);
   });
 
-  it.each(Object.entries(FIGMA))('places the %s photograph and sizes it at half its render', (id, want) => {
-    const m = MILESTONES.find((x) => x.id === id)!;
-    expect(m.place.media).toBeDefined();
-    expect(m.place.media!.x).toBe(want.media[0] - LANE_LEFT);
-    expect(m.place.media!.y).toBe(want.media[1] - LANE_TOP[want.lane]);
-    expect(m.media!.width).toBe(want.media[2]);
-    expect(m.media!.height).toBe(want.media[3]);
-  });
+  it.each(Object.entries(FIGMA))(
+    'places the %s photograph and sizes it at half its render',
+    (id, want) => {
+      const m = MILESTONES.find((x) => x.id === id)!;
+      expect(m.place.media).toBeDefined();
+      expect(m.place.media!.x).toBe(want.media[0] - LANE_LEFT);
+      expect(m.place.media!.y).toBe(want.media[1] - LANE_TOP[want.lane]);
+      expect(m.media!.width).toBe(want.media[2]);
+      expect(m.media!.height).toBe(want.media[3]);
+    },
+  );
 
   /*
    * The regression this replaces: `max-width: 340px` above 1024 stretched every

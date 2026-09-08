@@ -56,7 +56,7 @@ describe('OurStoryPage', () => {
   describe('intro', () => {
     const blocks = () => [...el.querySelectorAll('.intro__block')];
 
-    it('renders both blocks in the Figma\'s order', () => {
+    it("renders both blocks in the Figma's order", () => {
       expect(blocks().map((b) => b.querySelector('h2')?.textContent?.trim())).toEqual([
         'Our mission',
         'Why making?',
@@ -108,7 +108,9 @@ describe('OurStoryPage', () => {
     });
 
     it('keeps meaningful photographs out of the decorative set', () => {
-      for (const img of el.querySelectorAll<HTMLImageElement>('img.intro__media, img.origin__photo')) {
+      for (const img of el.querySelectorAll<HTMLImageElement>(
+        'img.intro__media, img.origin__photo',
+      )) {
         expect(img.getAttribute('alt')?.trim().length ?? 0).toBeGreaterThan(8);
         expect(img.getAttribute('aria-hidden')).toBeNull();
       }

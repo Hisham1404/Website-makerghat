@@ -26,7 +26,7 @@ describe('SiteFooter', () => {
     expect(el.querySelector('.site-footer__title')?.textContent).toContain('with Us');
   });
 
-  it('renders the two Figma columns, not the live site\'s four', () => {
+  it("renders the two Figma columns, not the live site's four", () => {
     const headings = [...el.querySelectorAll('.site-footer__column h2')].map((h) =>
       h.textContent!.trim(),
     );

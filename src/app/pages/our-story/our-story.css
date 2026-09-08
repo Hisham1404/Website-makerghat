@@ -327,10 +327,12 @@
 .origin::before {
   content: '';
   position: absolute;
-  inset: calc(var(--road-width) / -2 - 1px) 0 calc(var(--road-width) / -2 - 1px) calc(var(--road-width) / -2 - 1px);
+  inset: calc(var(--road-width) / -2 - 1px) 0 calc(var(--road-width) / -2 - 1px)
+    calc(var(--road-width) / -2 - 1px);
   border: var(--road-dash-width) dashed var(--road-dash);
   border-right: 0;
-  border-radius: calc(var(--road-radius) - var(--road-width) / 2) 0 0 calc(var(--road-radius) - var(--road-width) / 2);
+  border-radius: calc(var(--road-radius) - var(--road-width) / 2) 0 0
+    calc(var(--road-radius) - var(--road-width) / 2);
   pointer-events: none;
 }
 

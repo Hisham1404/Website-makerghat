@@ -187,7 +187,9 @@ export const MILESTONES: readonly Milestone[] = [
       height: 260,
       side: 'after',
     },
-    items: ['We launched our first IGNITE incubator cohort for young innovators across rural Tamil Nadu'],
+    items: [
+      'We launched our first IGNITE incubator cohort for young innovators across rural Tamil Nadu',
+    ],
   },
   {
     id: '2025',
@@ -219,7 +221,9 @@ export const MILESTONES: readonly Milestone[] = [
       height: 289,
       side: 'after',
     },
-    items: ['We published the Discovery Diary, our first at-home intervention for hands-on learning for children'],
+    items: [
+      'We published the Discovery Diary, our first at-home intervention for hands-on learning for children',
+    ],
   },
 ];
 

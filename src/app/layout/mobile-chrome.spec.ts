@@ -52,10 +52,7 @@ const read = (p: string) => stripComments(readFileSync(join(root, p), 'utf8'));
 
 const tabsCss = read('src/app/layout/about-tabs/about-tabs.css');
 const headerCss = read('src/app/layout/site-header/site-header.css');
-const headerHtml = readFileSync(
-  join(root, 'src/app/layout/site-header/site-header.html'),
-  'utf8',
-);
+const headerHtml = readFileSync(join(root, 'src/app/layout/site-header/site-header.html'), 'utf8');
 
 /* Everything from the first max-width:767 block on is the phone layout. */
 const tabsMobile = tabsCss.slice(tabsCss.indexOf('@media (max-width: 767px)'));
@@ -137,9 +134,7 @@ describe('About Us stays reachable once the tab bar is hidden', () => {
   const about = () => NAV_ITEMS.find((i) => i.label === 'About us')!;
 
   it('carries every About Us section as a drawer link', () => {
-    expect(about().drawerChildren?.map((c) => c.label)).toEqual(
-      ABOUT_TABS.map((t) => t.label),
-    );
+    expect(about().drawerChildren?.map((c) => c.label)).toEqual(ABOUT_TABS.map((t) => t.label));
     expect(about().drawerChildren?.map((c) => c.href)).toEqual(ABOUT_TABS.map((t) => t.path));
   });
 
@@ -316,10 +311,7 @@ describe('mobile drawer — their panel, not a white sheet', () => {
   });
 
   it('hides the drawer furniture on desktop, where the nav is a menu bar', () => {
-    const body = groupedRule(headerCss, [
-      '.site-header__drawer-top',
-      '.site-header__drawer-art',
-    ]);
+    const body = groupedRule(headerCss, ['.site-header__drawer-top', '.site-header__drawer-art']);
     expect(body).toMatch(/display:\s*none/);
   });
 
@@ -345,10 +337,7 @@ describe('mobile drawer — their panel, not a white sheet', () => {
     expect(cssRule(drawerMobile, '.site-header__nav a')).toMatch(
       /color:\s*var\(--color-primary-50\)/,
     );
-    const child = groupedRule(drawerMobile, [
-      '.site-header__dropdown a',
-      '.site-header__subnav a',
-    ]);
+    const child = groupedRule(drawerMobile, ['.site-header__dropdown a', '.site-header__subnav a']);
     expect(child).toMatch(/color:\s*var\(--color-on-primary-muted\)/);
     expect(child).toMatch(/font-size:\s*var\(--font-size-14\)/);
   });

@@ -28,7 +28,9 @@ import { groupedRule, rule as cssRule, stripComments } from '../../../testing/cs
  */
 
 const root = join(__dirname, '../../../..');
-const pageCss = stripComments(readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'));
+const pageCss = stripComments(
+  readFileSync(join(root, 'src/app/pages/our-story/our-story.css'), 'utf8'),
+);
 const rule = (selector: string) => cssRule(pageCss, selector);
 
 describe('intro typography — measured', () => {

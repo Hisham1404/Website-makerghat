@@ -46,7 +46,8 @@ export function rule(css: string, selector: string): string {
 /** The body of the first rule whose selector list is exactly `selectors`. */
 export function groupedRule(css: string, selectors: readonly string[]): string {
   const found = rules(css).find(
-    (r) => r.selectors.length === selectors.length && selectors.every((s, i) => r.selectors[i] === s),
+    (r) =>
+      r.selectors.length === selectors.length && selectors.every((s, i) => r.selectors[i] === s),
   );
   if (!found) throw new Error(`no rule for ${selectors.join(', ')}`);
   return found.body;

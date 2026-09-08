@@ -19,9 +19,9 @@
   --color-grey: #ffffff4d;
   --color-red: #e60000;
 
-  --color-neutral-50: #f9f4e8;   /* page background — the cream */
-  --color-neutral-100: #f5ead6;  /* Figma year-chip + accordion fill, sampled */
-  --color-neutral-200: #ead8b5;  /* milestone card fill */
+  --color-neutral-50: #f9f4e8; /* page background — the cream */
+  --color-neutral-100: #f5ead6; /* Figma year-chip + accordion fill, sampled */
+  --color-neutral-200: #ead8b5; /* milestone card fill */
   --color-neutral-700: #856633;
   --color-neutral-900: #3f2b12;
 
@@ -32,7 +32,7 @@
   --color-primary-200: #9289b3;
   --color-primary-300: #776ba0;
   --color-primary-400: #5c4e8d;
-  --color-primary-500: #4a3a80;  /* headings, nav, footer */
+  --color-primary-500: #4a3a80; /* headings, nav, footer */
   --color-primary-500-80: #4a3a80cc;
   --color-primary-600: #40336f;
   --color-primary-700: #362c5f;
@@ -60,7 +60,7 @@
   --color-secondary-200: #f6b3a4;
   --color-secondary-300: #f4977b;
   --color-secondary-400: #f1866a;
-  --color-secondary-500: #f1805e;  /* CTA buttons, accents */
+  --color-secondary-500: #f1805e; /* CTA buttons, accents */
   --color-secondary-600: #d56b4e;
   --color-secondary-700: #b95d44;
   --color-secondary-800: #9d4f39;
@@ -89,7 +89,7 @@
   --color-green-300: #81d4a0;
   --color-green-400: #72cc92;
   --color-green-500: #66c67f;
-  --color-green-600: #58ad6f;  /* the 3px journey stroke */
+  --color-green-600: #58ad6f; /* the 3px journey stroke */
   --color-green-700: #4b945f;
   --color-green-800: #3d7b4f;
   --color-green-900: #234a30;
