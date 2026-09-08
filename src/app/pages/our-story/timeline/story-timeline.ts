@@ -21,6 +21,19 @@ interface TimelineNode {
    * which gets it wrong on reversed rows.
    */
   readonly panelAlign: 'left' | 'right';
+  /**
+   * Which half of the panel this milestone's road box occupies below 768, where
+   * the snake is one turn per milestone rather than one per lane.
+   *
+   * Computed from the index across the WHOLE timeline, not from :nth-child
+   * inside the row. Within-row parity only equals global parity while
+   * CHIPS_PER_ROW is even — true today at 2, and a coincidence, not a rule.
+   */
+  readonly roadSide: 'left' | 'right';
+  /** First milestone: the road arrives here, so its box draws no top edge. */
+  readonly isRoadStart: boolean;
+  /** Last milestone: the road stops here, so its box draws no bottom edge. */
+  readonly isRoadEnd: boolean;
 }
 
 interface TimelineRow {
@@ -75,15 +88,31 @@ export class StoryTimeline {
         direction,
         isLast: index === all.length - 1,
         height: LANE_HEIGHTS[index] ?? LANE_HEIGHTS[LANE_HEIGHTS.length - 1],
-        nodes: milestones.map((milestone, i) => ({
-          milestone,
-          panelAlign: (i === rightMost && milestones.length > 1 ? 'right' : 'left') as
-            | 'left'
-            | 'right',
-        })),
+        nodes: milestones.map((milestone, i) => {
+          const overall = index * CHIPS_PER_ROW + i;
+
+          return {
+            milestone,
+            panelAlign: (i === rightMost && milestones.length > 1 ? 'right' : 'left') as
+              | 'left'
+              | 'right',
+            roadSide: (overall % 2 === 0 ? 'left' : 'right') as 'left' | 'right',
+            isRoadStart: overall === 0,
+            isRoadEnd: overall === MILESTONES.length - 1,
+          };
+        }),
       };
     },
   );
+
+  /**
+   * Which rail the road finishes on below 768, which is where the terminus dot
+   * has to sit. Nine milestones alternate to an odd count and end on the left;
+   * a tenth would end on the right, and this makes the CSS follow rather than
+   * needing a hand edit.
+   */
+  protected readonly roadEndSide: 'left' | 'right' =
+    (MILESTONES.length - 1) % 2 === 0 ? 'left' : 'right';
 
   /**
    * The road, as one path. Above the artboard breakpoint the lanes draw no
