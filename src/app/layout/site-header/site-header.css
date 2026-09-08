@@ -113,6 +113,18 @@
   color: var(--color-primary-500);
 }
 
+/*
+ * Drawer-only sub-links, for the About Us sections the tab bar stops offering
+ * below 768. Hidden everywhere else — including 768..1023, where the drawer
+ * exists but the tab bar is still on screen and would list them twice.
+ */
+.site-header__subnav {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* Mobile toggle ------------------------------------------------------- */
 
 .site-header__toggle {
@@ -129,14 +141,21 @@
   cursor: pointer;
 }
 
+/*
+ * Their hamburger, reproduced rather than imported. hamburger_open.svg is
+ * 20x18 with three 2px lines at y=1.15, 8.15 and 15.15 — 7px apart — stroked
+ * #362C5F with butt caps. That colour is already in the token file as
+ * --color-primary-700, so CSS renders it identically to their asset without a
+ * second request. This build previously drew 24px pills in the mid-tone
+ * --color-primary-500, which is a visibly different mark.
+ */
 .site-header__bars,
 .site-header__bars::before,
 .site-header__bars::after {
   display: block;
-  width: 24px;
+  width: 20px;
   height: 2px;
-  border-radius: var(--radius-pill);
-  background: var(--color-primary-500);
+  background: var(--color-primary-700);
 }
 
 .site-header__bars {
@@ -205,5 +224,19 @@
 
   .site-header__caret {
     display: none;
+  }
+}
+
+/* Below the tab-bar breakpoint the About Us sections move into the drawer --- */
+
+@media (max-width: 767px) {
+  .site-header__subnav {
+    display: block;
+    padding: 0 0 var(--space-8) var(--space-16);
+  }
+
+  .site-header__subnav a {
+    padding: var(--space-12) 0;
+    font-size: var(--font-size-16);
   }
 }

@@ -11,9 +11,28 @@
   background: var(--color-white);
 }
 
-.section-tabs {
-  width: min(100% - var(--gutter) * 2, var(--container-width));
+/*
+ * The panel is a 1280 band that stops being inset once the viewport is
+ * narrower than it — measured off makerghat.org, where `.tab-content` is
+ * x=80 w=1280 at 1440 but x=0 and viewport-wide at 1024, 768 and 375.
+ *
+ * Subtracting the gutter here instead, as this did, keeps a white margin at
+ * every width below about 1400: 913px of cream in a 1024 viewport, 343 in a
+ * 375 one. The gutter belongs to `.container`, which is a different job.
+ *
+ * The content inset is not restored as padding on this element on purpose —
+ * `.panel-inset` carries it per block so the hero can still run the full panel
+ * width. Dropping the gutter alone puts the h1 at x=20 on a phone, which is
+ * where theirs is, and leaves it at x=128 on a 1440 screen, which is where the
+ * Figma draws it.
+ */
+.section-tabs,
+.section-tabs__panel {
+  width: min(100%, var(--container-width));
   margin-inline: auto;
+}
+
+.section-tabs {
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -70,9 +89,8 @@
   font-weight: var(--font-weight-600);
 }
 
+/* Top-left is square because the first tab sits on it. */
 .section-tabs__panel {
-  width: min(100% - var(--gutter) * 2, var(--container-width));
-  margin-inline: auto;
   background: var(--color-neutral-50);
   border-top-right-radius: var(--radius-lg);
 }
@@ -84,16 +102,23 @@
 }
 
 @media (max-width: 767px) {
-  .section-tabs a {
-    padding: var(--space-12) var(--space-24);
-    font-size: var(--font-size-16);
+  /*
+   * No tab bar on a phone. `div.tabs` computes `display: none` at 768, 600 and
+   * 375 on makerghat.org; this build was scrolling four tabs off the right
+   * edge instead. The four destinations move into the header drawer — see
+   * `drawerChildren` in data/navigation.ts, without which three of the four
+   * About Us sections would have no route in from a phone.
+   *
+   * Their switch is at 768 and this one at 767, because 768 is the min-width
+   * this build's desktop rules already start at; the two differ on one pixel.
+   */
+  .section-tabs {
+    display: none;
   }
 
-  .section-tabs li:not(:first-child) {
-    margin-left: -16px;
-  }
-
+  /* Nothing sits on the top-left corner now, so both corners round. */
   .section-tabs__panel {
-    border-top-right-radius: var(--radius-sm);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
   }
 }
