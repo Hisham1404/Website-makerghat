@@ -96,18 +96,6 @@ describe('mobile road — which side each milestone turns on', () => {
     expect(milestones()[0].getAttribute('data-road-side')).toBe('left');
   });
 
-  it('marks the first milestone as the start of the road, and only that one', () => {
-    const marked = milestones().filter((m) => m.hasAttribute('data-road-start'));
-    expect(marked).toHaveLength(1);
-    expect(marked[0]).toBe(milestones()[0]);
-  });
-
-  it('marks the last milestone as the end of the road, and only that one', () => {
-    const marked = milestones().filter((m) => m.hasAttribute('data-road-end'));
-    expect(marked).toHaveLength(1);
-    expect(marked[0]).toBe(milestones().at(-1));
-  });
-
   it('has one milestone element per milestone in the data', () => {
     expect(milestones()).toHaveLength(MILESTONES.length);
   });
@@ -211,15 +199,16 @@ describe('mobile road — the geometry, in the stylesheet', () => {
   });
 
   /*
-   * The road arrives down the origin box's left stroke and continues into the
-   * first vertical, so the first box must not draw a top edge or the corner
-   * radius curves away from the line coming into it.
+   * The first box KEEPS its top edge now. The road drops out of the origin
+   * card at the card's CENTRE, and this box spans 0..50%, so the right-hand
+   * end of its top border is exactly where that drop lands. The road then runs
+   * left along it, turns at the top-left corner and heads down the rail.
+   *
+   * It used to be removed, back when the drop came down at the far left and a
+   * top edge would have crossed it.
    */
-  it('drops the top edge where the road arrives', () => {
-    const body = cssRule(mobile, '.milestone[data-road-start]::before');
-    expect(body).toMatch(/border-top:\s*0/);
-    expect(body).toMatch(/border-top-left-radius:\s*0/);
-    expect(body).toMatch(/border-top-right-radius:\s*0/);
+  it('keeps the first box’s top edge, which is what the drop lands on', () => {
+    expect(mobile).not.toMatch(/\.milestone\[data-road-start\]::before\s*\{[^}]*border-top:\s*0/);
   });
 
   /*
@@ -277,10 +266,14 @@ describe('mobile road — the artboard above 768 is untouched', () => {
 });
 
 describe('mobile road — the template carries the parts the CSS needs', () => {
-  it('binds the side, the start and the end onto each milestone', () => {
+  /*
+   * Only the side is bound now. The start and end attributes drove the first
+   * box's missing top edge and the last box's missing floor; the road keeps
+   * both edges since it enters at the centre and leaves at the centre, so
+   * neither attribute has any CSS behind it any more.
+   */
+  it('binds the road side onto each milestone', () => {
     expect(html).toMatch(/\[attr\.data-road-side\]="node\.roadSide"/);
-    expect(html).toMatch(/\[attr\.data-road-start\]/);
-    expect(html).toMatch(/\[attr\.data-road-end\]/);
   });
 });
 
@@ -399,6 +392,13 @@ describe('mobile road — the corrections', () => {
   );
   const phone = storyCss.slice(storyCss.indexOf('@media (max-width: 767px)'));
 
+  /*
+   * A. Opening a year knocked the chip off centre. `.milestone` centres its
+   *    children, but the chip and its panel share a `.milestone__disclosure`
+   *    wrapper and that wrapper was a plain block. Closed it is the chip's own
+   *    156px; open it grows to the panel's 287px and the narrower chip sits at
+   *    its left edge — measured drifting from x=187.5 to 122.
+   */
   it('centres the chip inside its disclosure, so opening a year cannot shift it', () => {
     const body = cssRule(mobile, '.milestone__disclosure');
     expect(body).toMatch(/display:\s*flex/);
@@ -406,37 +406,58 @@ describe('mobile road — the corrections', () => {
     expect(body).toMatch(/align-items:\s*center/);
   });
 
-  /* Three sides drawn is a box. The road draws a top edge and ONE vertical. */
-  it('stops drawing the origin card as a closed box', () => {
+  /*
+   * B. The origin card is a CLOSED box on a phone — fully enclosed in green,
+   *    all four sides, all four corners rounded. That is a deliberate departure
+   *    from the desktop artboard, where its top and bottom edges are partial
+   *    because the road runs along part of each and continues out of frame.
+   *    On a phone the card is where the road begins, so it reads better as a
+   *    complete enclosure with the road leaving it.
+   */
+  it('encloses the origin card completely', () => {
     const body = cssRule(phone, '.origin');
-    expect(body).not.toMatch(/border-right:\s*var\(--road-width\)/);
-    expect(body).toMatch(/border-bottom:\s*0/);
+    expect(body).toMatch(/border-right:\s*var\(--road-width\) solid var\(--road-color\)/);
+    expect(body).toMatch(/border-bottom:\s*var\(--road-width\) solid var\(--road-color\)/);
+    expect(body).toMatch(/border-radius:\s*var\(--road-radius\)\s*;/);
   });
 
-  /* Only the corner where the top edge turns into the left rail is rounded. */
-  it('rounds only the corner the road actually turns', () => {
-    expect(cssRule(phone, '.origin')).toMatch(/border-radius:\s*var\(--road-radius\) 0 0 0/);
+  /* Nothing is cut back, because no edge stops partway any more. */
+  it('leaves both edge cuts off, since the box is whole', () => {
+    const body = groupedRule(phone, ['.origin__cut::before', '.origin__cut::after']);
+    expect(body).toMatch(/display:\s*none/);
+  });
+
+  /* The dashed centre line runs the whole way round with the stroke. */
+  it('runs the dashed line round all four sides', () => {
+    const body = cssRule(phone, '.origin::before');
+    expect(body).toMatch(/border:\s*var\(--road-dash-width\) dashed var\(--road-dash\)/);
+    expect(body).not.toMatch(/border-right:\s*0/);
+    expect(body).not.toMatch(/border-bottom:\s*0/);
   });
 
   /*
-   * The mask starts at the box's own centre. `50%` alone is 3px out, because
-   * .origin__cut resolves against the PADDING box and that box is no longer
-   * symmetric once the right border is gone — hence the half-stroke correction.
+   * C. The road leaves that box from the CENTRE of its bottom edge, not from
+   *    the bottom-left corner.
+   *
+   *    Which is why the first milestone keeps its top edge: that box spans
+   *    0..50%, so the right-hand end of its top border sits exactly under the
+   *    drop. The road lands there, runs left, and turns down the rail.
    */
-  it('cuts the top stroke back to the centre, so the road starts there', () => {
-    const body = cssRule(phone, '.origin__cut::before');
-    expect(body).toMatch(/display:\s*block/);
-    expect(body).toMatch(/left:\s*calc\(50% - var\(--road-width\) \/ 2\)/);
+  it('drops the road out of the card’s centre, not its left corner', () => {
+    expect(cssRule(mobile, '.journey__lead')).toMatch(
+      /margin-left:\s*calc\(50% - var\(--road-width\) \/ 2\)/,
+    );
   });
 
-  it('leaves the bottom cut off, since there is no bottom edge to cut', () => {
-    expect(cssRule(phone, '.origin__cut::after')).toMatch(/display:\s*none/);
-  });
-
-  /* The dashed centre line has to mirror whichever sides the stroke draws. */
-  it('matches the dashed line to the two sides that remain', () => {
-    const body = cssRule(phone, '.origin::before');
-    expect(body).toMatch(/border-right:\s*0/);
-    expect(body).toMatch(/border-bottom:\s*0/);
+  /*
+   * With the drop moved and the first box keeping its top edge, neither marker
+   * attribute drives any CSS. Both come off rather than sitting in the DOM
+   * meaning nothing.
+   */
+  it('retires the start and end attributes, which now drive nothing', () => {
+    expect(css).not.toMatch(/data-road-start/);
+    expect(css).not.toMatch(/data-road-end\b/);
+    expect(html).not.toMatch(/data-road-start/);
+    expect(html).not.toMatch(/data-road-end\b/);
   });
 });

@@ -620,17 +620,16 @@
     margin: var(--space-32) var(--panel-pad) 0;
     padding: var(--space-32) var(--space-24);
     /*
-     * A path, not a box. This card had grown all four borders on a phone,
-     * which is the exact mistake the desktop road was rebuilt to avoid — three
-     * or four sides drawn reads as a rectangle, not as a road passing through.
-     *
-     * It draws a top edge and ONE vertical, like every lane below it: the road
-     * begins at the centre of the top edge (cut back by .origin__cut::before),
-     * turns down the left side and runs straight on into the timeline. So no
-     * right border, no floor, and only the corner it actually turns is round.
+     * Fully enclosed on a phone: all four sides, all four corners. That is a
+     * deliberate departure from the desktop artboard, where this card's top and
+     * bottom edges are PARTIAL because the road runs along part of each and
+     * carries on out of frame. Here the card is where the road begins, so it
+     * reads better as a complete box that the road then leaves — and it leaves
+     * from the centre of the bottom edge, not from a corner.
      */
-    border-bottom: 0;
-    border-radius: var(--road-radius) 0 0 0;
+    border-right: var(--road-width) solid var(--road-color);
+    border-bottom: var(--road-width) solid var(--road-color);
+    border-radius: var(--road-radius);
   }
 
   /*
@@ -638,27 +637,20 @@
    * carried `border-right: 0` from the desktop rule — three sides dashed and
    * the fourth plain green.
    */
-  /* The dashed centre line mirrors whichever sides the stroke still draws. */
+  /* The dashed centre line runs the whole way round with the stroke. */
   .origin::before {
     inset: calc(var(--road-width) / -2 - 1px);
-    border-right: 0;
-    border-bottom: 0;
-    border-radius: calc(var(--road-radius) - var(--road-width) / 2) 0 0 0;
+    border: var(--road-dash-width) dashed var(--road-dash);
+    border-radius: calc(var(--road-radius) - var(--road-width) / 2);
   }
 
   /*
-   * The top stroke is cut back to the card's centre, which is where the road
-   * starts. `50%` alone lands 3px right of it: .origin__cut resolves against
-   * the PADDING box, and that box stops being symmetric once the right border
-   * is gone — so half a stroke comes back off.
+   * Nothing is cut back. Both of this card's horizontal edges are PARTIAL on
+   * the desktop artboard, because the road runs along part of each and carries
+   * on out of frame; on a phone the card is a complete enclosure and the road
+   * leaves it from the centre of the bottom edge instead.
    */
-  .origin__cut::before {
-    display: block;
-    top: calc(var(--road-width) * -1 - 2px);
-    left: calc(50% - var(--road-width) / 2);
-  }
-
-  /* No bottom edge on a phone, so nothing to cut there. */
+  .origin__cut::before,
   .origin__cut::after {
     display: none;
   }

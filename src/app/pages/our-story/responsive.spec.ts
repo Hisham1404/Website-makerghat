@@ -147,28 +147,29 @@ describe('the mobile road is one line', () => {
   });
 
   /*
-   * The bottom-left corner stays square so the card's left border runs straight
-   * on into the rail — rounded, it curves away above the card's own bottom and
-   * the line reads as a box that closes and a separate stroke that begins.
-   *
-   * The card used to draw all four sides here. It now draws a top edge and one
-   * vertical, like every lane below it, so only the corner where those two meet
-   * is round and the other three are 0.
+   * On a phone this card is a complete enclosure — all four sides, all four
+   * corners — and the road leaves it from the CENTRE of the bottom edge rather
+   * than from a corner. So no corner needs squaring: nothing continues out of
+   * one. On the desktop artboard the same card's horizontal edges are partial
+   * instead, because there the road runs along part of each.
    */
-  it('squares the corner the rail continues through', () => {
-    expect(cssRule(mobile, '.origin')).toMatch(/border-radius:\s*var\(--road-radius\) 0 0 0/);
+  it('encloses the card and rounds every corner', () => {
+    const body = cssRule(mobile, '.origin');
+    expect(body).toMatch(/border-radius:\s*var\(--road-radius\)\s*;/);
+    expect(body).toMatch(/border-right:\s*var\(--road-width\) solid var\(--road-color\)/);
+    expect(body).toMatch(/border-bottom:\s*var\(--road-width\) solid var\(--road-color\)/);
   });
 
   /*
    * The dashed centre line has to mirror whichever sides the stroke draws, or
-   * some edges read dashed and others plain green. It once had to GAIN a right
-   * dash, because mobile added a right border; now that the card is a path
-   * rather than a box it has to lose the right and bottom ones again.
+   * some edges read dashed and others plain green — the desktop rule leaves
+   * `border-right: 0` on it, which is right up there and wrong down here.
+   * The card is closed on a phone, so the dash goes all the way round with it.
    */
   it('mirrors the dashed centre line to the sides the stroke actually draws', () => {
     const body = cssRule(mobile, '.origin::before');
-    expect(body).toMatch(/border-right:\s*0/);
-    expect(body).toMatch(/border-bottom:\s*0/);
+    expect(body).toMatch(/border:\s*var\(--road-dash-width\) dashed var\(--road-dash\)/);
+    expect(body).not.toMatch(/border-right:\s*0/);
   });
 
   /*

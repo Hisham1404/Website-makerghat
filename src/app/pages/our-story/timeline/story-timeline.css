@@ -86,7 +86,13 @@
   display: block;
   width: var(--road-width);
   height: var(--road-step-drop);
-  margin-left: 0;
+  /*
+   * The road leaves the origin card from the CENTRE of its bottom edge. The
+   * first milestone box spans 0..50%, so the right-hand end of its top border
+   * sits exactly under this drop: the road lands there, runs left along it and
+   * turns down the rail. Half a stroke back puts the bar's centre on 50%.
+   */
+  margin-left: calc(50% - var(--road-width) / 2);
   background: var(--road-color);
 }
 
@@ -218,18 +224,6 @@
 }
 
 /*
- * The road arrives down the origin box's own left stroke and continues straight
- * into the first vertical, so the first box draws no top edge — with one, the
- * corner radius curves away from the line coming into it and the joint reads as
- * two strokes that nearly meet.
- */
-.milestone[data-road-start]::before {
-  border-top: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-/*
  * The last box KEEPS its floor. That border stops at 50% — the box is half the
  * panel wide — so the road runs out to the centre and the terminus dot sits on
  * the end of it. It used to be removed so the rail could stop at a dot on the
@@ -277,12 +271,6 @@
   left: 50%;
   border-left: 0;
   border-radius: 0 var(--road-centre-radius) var(--road-centre-radius) 0;
-}
-
-.milestone[data-road-start] .journey__track {
-  border-top: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
 }
 
 /* Joint markers ---------------------------------------------------------- */

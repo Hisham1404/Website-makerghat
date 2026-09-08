@@ -14,7 +14,7 @@ A recreation of the MakerGhat **Our Story** page from its Figma design, built wi
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Match the Figma design closely                       | Every coordinate is **measured** off the 1440×4503 export, not eyeballed — see [Development approach](#development-approach) |
 | Fully responsive: desktop, tablet, mobile            | Three strategies, one per range — [Responsive strategy](#responsive-strategy)                                                |
-| Clean, maintainable, well-structured code            | Data-driven components, no magic numbers without a cited measurement, 350 tests                                              |
+| Clean, maintainable, well-structured code            | Data-driven components, no magic numbers without a cited measurement, 348 tests                                              |
 | Good coding standards and best practices             | Standalone zoneless components, `OnPush`, typed data modules, semantic landmarks, WCAG-sized touch targets                   |
 | Compatible with the existing makerghat.org structure | Their own design tokens are inherited verbatim — [Compatibility](#compatibility-with-makerghatorg)                           |
 
@@ -27,7 +27,7 @@ Requires **Node 22.22+** (developed on 24.20).
 ```bash
 npm install
 npm start      # dev server on http://localhost:4200
-npm test       # 350 unit tests (Vitest)
+npm test       # 348 unit tests (Vitest)
 npm run build  # production bundle into dist/our-story/browser
 ```
 
@@ -131,7 +131,7 @@ The whole composition then scales with the panel instead of being pinned to 1280
 
 ### Testing
 
-350 tests, run with `npm test`. They are not coverage theatre — they pin the
+348 tests, run with `npm test`. They are not coverage theatre — they pin the
 **measurements** so a later tidy-up cannot quietly undo them, and each one cites
 the number it protects. A representative example:
 
