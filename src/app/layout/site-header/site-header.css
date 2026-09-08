@@ -197,11 +197,13 @@
    * #4A3A80 with the links right-aligned. It covers the viewport rather than
    * hanging under the header, which is why the close control lives inside it.
    *
-   * Every colour here was already in the token file — #4A3A80 is
-   * --color-primary-500, the parent links' #F1EEF9 is --color-primary-50 and
-   * the children's #AEA6C6 is --color-primary-100. Nothing new was needed,
-   * which is a fair check on the palette having been read off their stylesheet
-   * correctly to begin with.
+   * The panel and the parent links come straight from the measured palette —
+   * #4A3A80 is --color-primary-500 and #F1EEF9 is --color-primary-50.
+   *
+   * The sub-links do NOT. Their #AEA6C6 (--color-primary-100) is 4.11:1 on
+   * this panel and AA wants 4.5 for text this size; axe flagged all 13 of them
+   * plus the footer's licence line. --color-on-primary-muted is the first tone
+   * up the ramp that clears it, at 4.53:1.
    */
   .site-header__nav {
     position: fixed;
@@ -217,6 +219,16 @@
   .site-header__nav.is-open {
     display: flex;
     flex-direction: column;
+  }
+
+  /*
+   * The global ring is `3px solid var(--color-primary-500)` — which is exactly
+   * this panel's background, so inside the drawer it drew at 1:1 and a keyboard
+   * user could not see where they were. White is 9.51:1 on it. axe does not
+   * evaluate focus styles, so nothing automated was ever going to catch this.
+   */
+  .site-header__nav :focus-visible {
+    outline-color: var(--color-white);
   }
 
   .site-header__drawer-top {
@@ -310,7 +322,7 @@
   .site-header__subnav a {
     padding: var(--space-8) 0;
     font-size: var(--font-size-14);
-    color: var(--color-primary-100);
+    color: var(--color-on-primary-muted);
   }
 
   .site-header__dropdown a:hover,

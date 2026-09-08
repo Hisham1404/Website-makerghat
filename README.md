@@ -131,7 +131,7 @@ The whole composition then scales with the panel instead of being pinned to 1280
 
 ### Testing
 
-267 tests, run with `npm test`. They are not coverage theatre — they pin the
+332 tests, run with `npm test`. They are not coverage theatre — they pin the
 **measurements** so a later tidy-up cannot quietly undo them, and each one cites
 the number it protects. A representative example:
 
@@ -155,11 +155,73 @@ the page readable rather than to shrink a fixed picture.
 |---|---|
 | **≥1024** | The measured layout. Every edge lands within 1px of the export. |
 | **768–1023** | The two-column stagger survives, but the numbers that are *facts about a 1280 panel* do not: columns split evenly rather than 589/531, the road lane's inset drops from 80px to 32px, and the cut-outs shrink so they stay inside their own column. Without this the copy wrapped onto eleven lines where the design has five. |
-| **<768** | One column. The road flattens to a single left rail that runs unbroken from the origin card through every year to a terminus dot, and each text block is paired with its own photograph. |
+| **<768** | One column, and the page chrome follows makerghat.org rather than the Figma, which has nothing to say about phones. The cream panel goes full-bleed, the About Us tab bar is hidden and its four destinations move into the drawer, and the road **still snakes** — one turn per milestone, drawn from alternating half-width border boxes. Each text block is paired with its own photograph. |
+
+Below 768 the reference is **their live site, measured**, not a guess. Their
+`.tab-content` is x=0 and viewport-wide at 375, 600 and 768 but x=80 w=1280 at
+1440; their `div.tabs` computes `display: none` on phones; and their About Us
+page runs the same serpentine road, one card per turn, out of a 157.6px box in a
+315.2px container. The mobile road is built the same way for a reason that is
+not fidelity: a year chip is a disclosure, so opening one changes a lane's
+height — opening 2023 grows it from 256px to 540px — and every joint still
+measures 10.00px, where a drawn path with baked geometry would need JS to
+re-measure on each toggle.
 
 Verified with real viewport resizes at 320, 375, 390, 414, 600, 768, 819, 1009,
 1280 and 1440: no horizontal page overflow, no touch target under 24×24, no text
 under 12px.
+
+---
+
+## Accessibility
+
+Audited with **axe-core 4.10.2** run against the real page — not the test DOM —
+at 375 and 1440, in four states: closed, accordion open, drawer open, and on a
+second route. Ruleset `wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa,
+best-practice`.
+
+**Result: 0 violations, 44–45 checks passing per state.**
+
+The audit found three things, and two of them axe could not have caught:
+
+| Found | Why it mattered | Fix |
+|---|---|---|
+| **Muted text on purple was 4.11:1** | AA wants 4.5 for text this size. 17 nodes — the footer's licence line and every sub-link in the drawer. | `--color-on-primary-muted: #b6afcc`, the first tone up the ramp that clears it at **4.53:1**, and only 12% lighter so it still reads a step quieter than its parent. |
+| **The focus ring was invisible on the drawer** | `:focus-visible` draws `3px solid var(--color-primary-500)` and the drawer's background *is* that colour — a **1:1** ring. A keyboard user in the mobile menu could not see where they were. axe does not evaluate focus styles. | White ring inside the panel: **9.51:1**. |
+| **The drawer did not contain focus** | It is `position: fixed; inset: 0`, so everything behind it is hidden — but it was all still tabbable, and Tab past the last link walked into a `<main>` the user cannot see. That is WCAG 2.2 **2.4.11 Focus Not Obscured**. | Focus moves in on open, returns to the toggle on close, and Tab wraps inside the panel. |
+
+Contrast, computed from the tokens rather than eyeballed:
+
+| Pair | Ratio | |
+|---|---|---|
+| purple `#4A3A80` on cream `#F9F4E8` | 8.67 | ✅ |
+| black on cream | 19.13 | ✅ |
+| white on purple | 9.51 | ✅ |
+| `--color-on-primary-muted` on purple | 4.53 | ✅ |
+| *(was)* `--color-primary-100` on purple | 4.11 | ❌ fixed |
+| newsletter label `#4D2117` on coral `#F1805E` | 5.17 | ✅ |
+| *white* on coral | 2.63 | ❌ — which is why the label is not white |
+
+That last row is worth keeping: the build plan predicted the coral button would
+be this palette's one contrast failure. It is not — the label was already dark
+brown. A test now pins that, so nobody "tidies" it to white.
+
+Also in place, and covered by tests rather than asserted here: one `<h1>` with
+`<h2>`s under it, `header`/`main`/`footer` landmarks, a skip link that is the
+first tab stop and lands on a focusable `main`, `aria-current="page"` on the
+active tab, `aria-expanded` disclosures that work from the keyboard with Escape
+to close, decorative artwork at `aria-hidden` / `alt=""`, and
+`prefers-reduced-motion` honoured.
+
+**One deliberate divergence from makerghat.org:** their drawer's menu rows are
+about 21px tall. That is below the 24×24 minimum this build holds itself to, so
+ours are 40–48px and the menu scrolls rather than fitting one screen.
+
+**Known limitation:** `:focus` styles could not be verified at runtime in the
+automation used here — the browser pane never holds document focus, so `:focus`
+never matches and any such check reports a false negative. The focus rules are
+verified at source level instead, and confirmed by reasoning about the token
+values. Worth a manual keyboard pass on a real browser before submission.
 
 ---
 

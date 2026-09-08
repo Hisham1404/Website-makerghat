@@ -334,8 +334,14 @@ describe('mobile drawer — their panel, not a white sheet', () => {
     expect(cssRule(drawerMobile, '.site-header__nav > ul')).toMatch(/align-items:\s*flex-end/);
   });
 
-  /* Parent 16px on --color-primary-50, children 14px on --color-primary-100. */
-  it('uses their two link tones, both already in the palette', () => {
+  /*
+   * Parent links take their measured #F1EEF9 unchanged. The children do NOT
+   * take their measured #AEA6C6: at 14px on this panel that is 4.11:1 and AA
+   * needs 4.5, which axe flagged across all 13 of them. --color-on-primary-muted
+   * is the first tone up the ramp that clears it, at 4.53:1, so it still reads
+   * a step quieter than its parent. See accessibility.spec.ts.
+   */
+  it('uses their parent tone, and a corrected one for the children', () => {
     expect(cssRule(drawerMobile, '.site-header__nav a')).toMatch(
       /color:\s*var\(--color-primary-50\)/,
     );
@@ -343,7 +349,7 @@ describe('mobile drawer — their panel, not a white sheet', () => {
       '.site-header__dropdown a',
       '.site-header__subnav a',
     ]);
-    expect(child).toMatch(/color:\s*var\(--color-primary-100\)/);
+    expect(child).toMatch(/color:\s*var\(--color-on-primary-muted\)/);
     expect(child).toMatch(/font-size:\s*var\(--font-size-14\)/);
   });
 });

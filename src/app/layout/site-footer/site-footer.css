@@ -162,7 +162,7 @@
   font-family: var(--font-outfit);
   font-size: var(--font-size-14);
   line-height: var(--line-height-20);
-  color: var(--color-primary-100);
+  color: var(--color-on-primary-muted);
 }
 
 /* Responsive ---------------------------------------------------------- */

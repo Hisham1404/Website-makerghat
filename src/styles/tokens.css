@@ -40,6 +40,19 @@
   --color-primary-800-80: #2d2650ce;
   --color-primary-900: #221e3f;
 
+  /*
+   * Muted text ON the purple panel — the drawer's sub-links and the footer's
+   * licence line. Not part of makerghat.org's measured ramp: their own quiet
+   * tone is --color-primary-100, and at 14px on --color-primary-500 that is
+   * 4.11:1 where AA needs 4.5. axe flagged it in 17 places.
+   *
+   * Walking from #AEA6C6 toward --color-primary-50, this is the first tone to
+   * clear the bar — 4.53:1, and only 12% of the way, so it still reads a step
+   * quieter than the parent links beside it. The measured token keeps its
+   * measured value; this one says what it is for.
+   */
+  --color-on-primary-muted: #b6afcc;
+
   /* Secondary — coral ---------------------------------------------------- */
   --color-secondary: #f1805e;
   --color-secondary-50: #fdeae5;
