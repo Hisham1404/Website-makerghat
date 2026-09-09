@@ -70,6 +70,24 @@
   outline: none;
 }
 
+/*
+ * Decorative overhang must not become a horizontal scrollbar.
+ *
+ * Media queries are evaluated against the viewport INCLUDING the classic
+ * scrollbar, but the content box is ~15px narrower. At a 768px viewport the
+ * desktop rules therefore apply to 753px of usable width, and
+ * `.origin__cut::before/::after` - which sit at `right: -10px` on purpose, to
+ * bury the square end of the stroke they cut - spill 10px off-screen once the
+ * cream panel goes full-bleed below 1280.
+ *
+ * `clip`, not `hidden`: `hidden` would make this a scroll container, which
+ * breaks `position: sticky` inside it and changes what `100vh` resolves to.
+ * `clip` only clips.
+ */
+.site-main {
+  overflow-x: clip;
+}
+
 /* Present for assistive tech, absent from the picture. */
 .visually-hidden {
   position: absolute;

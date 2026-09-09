@@ -189,3 +189,37 @@ describe('the mobile road is one line', () => {
     expect(body).toMatch(/width:\s*var\(--road-dot\)/);
   });
 });
+
+/*
+ * The decorative overhang must not become a horizontal scrollbar.
+ *
+ * Found on the deployed site at a 768px viewport. Media queries are evaluated
+ * against the viewport INCLUDING the classic scrollbar, but the content box is
+ * 15px narrower - so at 768 the desktop rules apply while only 753px is usable.
+ * `.origin__cut::before/::after` deliberately sit at `right: -10px` to bury the
+ * square end of the stroke they cut, which is invisible while the cream panel
+ * is inset, and 10px of horizontal scroll once the panel goes full-bleed below
+ * 1280.
+ *
+ * `clip`, not `hidden`: `overflow: hidden` would make the page a scroll
+ * container, which breaks position: sticky and changes what `100vh` means
+ * inside it. `clip` just clips.
+ */
+describe('horizontal overflow', () => {
+  const layoutCss = stripComments(readFileSync(join(root, 'src/styles/layout.css'), 'utf8'));
+
+  it('clips decorative overhang at the page wrapper', () => {
+    expect(cssRule(layoutCss, '.site-main')).toMatch(/overflow-x:\s*clip/);
+  });
+
+  it('clips rather than scrolls, so sticky and vh still work', () => {
+    expect(cssRule(layoutCss, '.site-main')).not.toMatch(/overflow-x:\s*(hidden|auto|scroll)/);
+  });
+
+  it('still lets the origin masks overhang, because that is what buries the stroke end', () => {
+    // The fix must clip the symptom, not delete the technique.
+    expect(groupedRule(pageCss, ['.origin__cut::before', '.origin__cut::after'])).toMatch(
+      /right:\s*calc\(var\(--road-width\) \* -1\)/,
+    );
+  });
+});
