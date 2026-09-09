@@ -303,6 +303,21 @@ single line in `_redirects`:
 
 ## Licence and attribution
 
-Brand assets (logos, photographs, illustrations) belong to MakerGhat and are used
-here solely for this recreation exercise. The MakerGhat site publishes its
-content under **CC BY-SA 4.0**, as declared in its own footer.
+**AI assistance.** Claude Code (Anthropic) was used while building this page — for writing
+the test suite and parts of the implementation, and for drafting documentation. The design
+decisions and the trade-offs recorded above are mine, and everything was reviewed and
+checked in a real browser before it went in.
+
+The measurements are not generated. Every coordinate in this build was read off the
+1440×4503 Figma export or off makerghat.org's own live DOM — the 195×84 chip, the 10px
+stroke, the 589/531 column split, the mobile serpentine's 240px rhythm — and the responsive
+and accessibility claims were verified by resizing a real browser and running axe-core
+against the rendered page, not by reading the CSS.
+
+**Brand assets.** Logos, photographs and illustrations belong to MakerGhat and are used
+here solely for this recreation exercise. The MakerGhat site publishes its content under
+**CC BY-SA 4.0**, as declared in its own footer. The social glyphs are SVG Repo icons that
+their own site uses, not MakerGhat originals.
+
+No other external code was copied in. Third-party dependencies are declared in
+`package.json`.
